@@ -13,6 +13,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginComponent } from './components/login/login.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { LoginComponent } from './components/login/login.component';
     RegisterComponent,
     HomeComponent,
     NavbarComponent,
-    LoginComponent
+    LoginComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,
