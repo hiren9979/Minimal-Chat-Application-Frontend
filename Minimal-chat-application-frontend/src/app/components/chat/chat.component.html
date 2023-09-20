@@ -3,7 +3,7 @@
       <h2>User List</h2>
      
       <ul class="user-list-items">
-        <li class="user-item" *ngFor="let user of userList" >
+        <li class="user-item" *ngFor="let user of userList" (click)="startChat(user)">
           <div class="user-avatar">
             <!-- Include user avatar image or initials -->
           </div>
