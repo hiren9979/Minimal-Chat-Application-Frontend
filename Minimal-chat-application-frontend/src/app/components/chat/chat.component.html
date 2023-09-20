@@ -1,0 +1,30 @@
+<div class="chat-container">
+    <div class="user-list">
+      <h2>User List</h2>
+     
+      <ul class="user-list-items">
+        <li class="user-item" *ngFor="let user of userList" >
+          <div class="user-avatar">
+            <!-- Include user avatar image or initials -->
+          </div>
+          <div class="user-info">
+            <p class="user-name">{{ user.firstName }}</p>
+            <!-- Add other user details here if needed -->
+          </div>
+        </li>
+      </ul>
+     
+    </div>
+    <div class="chat-with-user">
+      <h2>Chat with User</h2>
+      <div class="chat-messages">
+        <!-- Chat messages go here -->
+      </div>
+      <div class="chat-input">
+        <!-- Input field for sending messages -->
+        <input type="text" placeholder="Type your message..." />
+        <button>Send</button>
+      </div>
+    </div>
+  </div>
+  

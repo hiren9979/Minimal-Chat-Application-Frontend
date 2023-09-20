@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Token } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -18,5 +19,19 @@ export class AuthService {
   login(user:any):Observable<any>{
       return this.http.post(`${this.apiUrl}/Login`,user);
   }
+
+  getUserList(headers: HttpHeaders):Observable<any>{
+    return this.http.get(`${this.apiUrl}/GetUsers`, { headers});
+  }
+
+  getToken(): string | null {
+    const user = localStorage.getItem('user');
+    if (user) {
+      const jsonObject = JSON.parse(user);
+      return jsonObject.token;
+    }
+    return null;
+  }
+  
 
 }
