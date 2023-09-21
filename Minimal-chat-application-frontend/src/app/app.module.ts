@@ -14,6 +14,7 @@ import { provideToastr } from 'ngx-toastr';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginComponent } from './components/login/login.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { ChatWithUserComponent } from './components/chat-with-user/chat-with-user.component';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { ChatComponent } from './components/chat/chat.component';
     HomeComponent,
     NavbarComponent,
     LoginComponent,
-    ChatComponent
+    ChatComponent,
+    ChatWithUserComponent
   ],
   imports: [
     BrowserModule,

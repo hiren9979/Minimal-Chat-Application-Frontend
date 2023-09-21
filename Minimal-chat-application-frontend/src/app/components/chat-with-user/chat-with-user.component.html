@@ -1,0 +1,26 @@
+<!-- Chat Header -->
+<div *ngIf="receiverName" class="chat-header">
+    <div class="avatar-circle">
+      <p class="avatar-initial">{{ receiverName.charAt(0) | titlecase }}</p>
+    </div>
+    <div class="chat-header-info">
+      <h2>{{ receiverName | titlecase }}</h2>
+      <!-- Add any additional user information here, such as status, etc. -->
+    </div>
+  </div>
+  
+  <!-- Chat Messages Container -->
+  <div class="chat-messages-container">
+    <div class="messages" *ngFor="let message of conversationHistory">
+      <div 
+        [ngClass]="{
+          'chat-messages sender': message.senderId.toLowerCase() === loggedinUserId,
+          'chat-messages receiver': message.senderId.toLowerCase() !== loggedinUserId
+        }"
+      >
+      <div>{{message.time}}</div>
+        {{ message.content }}
+      </div>
+    </div>
+  </div>
+  

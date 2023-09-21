@@ -1,22 +1,29 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from 'src/app/service/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { ChatService } from 'src/app/service/chat.service';
+import { FormBuilder, FormGroup , Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css'],
 })
-export class ChatComponent {
+export class ChatComponent implements OnInit {
+
+  sendMessageForm!: FormGroup;
+
   userList: any[] = [];
   selectedUser: any = null; // To store the selected user
   messageText: string = ''; // To store the message text
-
+  conversationHistory : any[] =  [];  //To store the conversation history with user
+  receiverName : string = '';
+  receiverId : string = '';
   constructor(
     private http: HttpClient,
+    private fb: FormBuilder,
     private authService: AuthService,
     private toastr: ToastrService,
     private router: Router,
@@ -26,6 +33,9 @@ export class ChatComponent {
 
   ngOnInit(): void {
     this.fetchUserList();
+    this.sendMessageForm = this.fb.group({
+      messageText: ['', [Validators.required]],
+    });
   }
 
   startChat(user: any) {
@@ -60,13 +70,13 @@ export class ChatComponent {
 
   fetchConversationHistory(){
     var senderId;
-    const sort = 'desc'; 
+    const sort = 'asc'; 
     const time = new Date(); 
-    const count = 20; 
-
+    var count = 20;
+    
     if (this.selectedUser) {
       // Check if a user is selected
-
+      this.receiverName = this.selectedUser.firstName;
       const user = localStorage.getItem('user');
       if (user) {
         const jsonObject = JSON.parse(user);
@@ -82,16 +92,17 @@ export class ChatComponent {
            Authorization: `Bearer ${token}`,
          });
          
-      const receiverId = this.selectedUser.id;
+       this.receiverId = this.selectedUser.id;
+      
 
       // Use your chat service to fetch conversation history
-      this.chatService.getConversationHistory(senderId, receiverId, sort, time, count,headers).subscribe(
+      this.chatService.getConversationHistory(senderId, this.receiverId, sort, time, count,headers).subscribe(
         (response) => {
-          // Handle success, e.g., display the conversation history
+          this.conversationHistory = response.messages;
+          console.log("fetched" , this.conversationHistory);
+          this.toastr.success('Conversation history retrieved!', 'Success');
           console.log('Conversation history:', response);
-
-          // You can update the chat-messages section with the conversation history here
-          // For example, assign the response to a variable and display it in the template
+          
         },
         (error) => {
           console.log('Error fetching conversation history:', error);
@@ -100,4 +111,6 @@ export class ChatComponent {
     }
   }
   }
+
+
 }
