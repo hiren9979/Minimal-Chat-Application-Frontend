@@ -10,7 +10,8 @@
     padding: 20px;
     border-right: 1px solid #ccc;
     background-color: #f0f0f0;
-    overflow-y: auto; /* Enable scrolling if the content overflows */
+    overflow-y: auto;
+     /* Enable scrolling if the content overflows */
   }
   
   .chat-with-user {
@@ -33,6 +34,7 @@
     display: flex;
     align-items: center;
     margin-top: 20px;
+    width: 100%;
   }
   
   .chat-input input {
@@ -41,7 +43,9 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-right: 10px;
+    box-sizing: border-box; /* Include padding and border in the width */
   }
+  
   
   .chat-input button {
     background-color: #007bff;
@@ -75,7 +79,7 @@
   padding: 10px;
   border-radius: 5px;
   overflow-y: auto;
-  max-height: 400px; /* Set a max height for scrollable list */
+  max-height: calc(100% - 20px); /* Set a max height for scrollable list */
 }
 
 .user-list h2 {
@@ -98,18 +102,26 @@
   background-color: #fff;
 }
 
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  background-color: #007bff; /* You can set user avatar background color */
-  color: #fff;
-  border-radius: 50%;
+
+.avatar-circle {
+  width: 50px; /* Set the width and height of the avatar */
+  height: 50px;
   display: flex;
-  justify-content: center;
+  border-radius: 50%;
   align-items: center;
-  margin-right: 10px;
-  font-weight: bold;
+  justify-content: center;
+  background-color: #9b5198; /* Set the background color of the circle */
 }
+
+.avatar-initial {
+  color: white; /* Set the text color of the initial */
+  font-size: 22px; /* Set the font size of the initial */
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+
+
 
 .user-info {
   flex: 1;
@@ -119,4 +131,5 @@
   font-weight: bold;
   margin: 0;
   font-size: 16px;
+  margin-left: 18px;
 }

@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Token } from '@angular/compiler';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from './auth.service';
+
 
 
 @Injectable({
@@ -10,7 +13,10 @@ import { Token } from '@angular/compiler';
 export class ChatService {
   private apiUrl = 'https://localhost:7275/api/Message';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService : AuthService
+    ) { }
 
   getConversationHistory(
     senderId: string,
@@ -30,5 +36,7 @@ export class ChatService {
 
       return this.http.get(`${this.apiUrl}/ConversationHistory`, { headers,params });
   }
+
+  // Create a method to send a message to a specific user
 
 }

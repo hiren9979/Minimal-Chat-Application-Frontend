@@ -4,27 +4,34 @@
      
       <ul class="user-list-items">
         <li class="user-item" *ngFor="let user of userList" (click)="startChat(user)">
-          <div class="user-avatar">
-            <!-- Include user avatar image or initials -->
+          <div class="avatar-circle">
+            <p class="avatar-initial">{{ user.firstName.charAt(0) | titlecase  }}</p>
           </div>
           <div class="user-info">
-            <p class="user-name">{{ user.firstName }}</p>
+            <p class="user-name">{{ user.firstName | titlecase  }}</p>
             <!-- Add other user details here if needed -->
           </div>
         </li>
       </ul>
      
     </div>
+
     <div class="chat-with-user">
-      <h2>Chat with User</h2>
+    
       <div class="chat-messages">
-        <!-- Chat messages go here -->
+        <chat-with-user [conversationHistory]="conversationHistory"  [receiverName]="receiverName"></chat-with-user>
       </div>
+    
       <div class="chat-input">
-        <!-- Input field for sending messages -->
-        <input type="text" placeholder="Type your message..." />
-        <button>Send</button>
-      </div>
+       
+          <input type="text"  placeholder="Type your message..."  name="message" formControlName="messageText" required />
+          <small *ngIf="sendMessageForm.get('messageText')?.hasError('required') && sendMessageForm.get('messageText')?.touched" style="color: red;">*Message is required</small>
+
+          <button type="submit">Send</button>
+        
+      </div>	
+
     </div>
-  </div>
+    
+  </div>  
   
