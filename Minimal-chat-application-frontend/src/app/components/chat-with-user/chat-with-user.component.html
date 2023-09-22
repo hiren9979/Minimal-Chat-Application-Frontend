@@ -1,6 +1,6 @@
 <!-- Chat Header -->
 <div class="chat">
-<div *ngIf="receiverName" class="chat-header">
+  <div *ngIf="receiverName" class="chat-header">
     <div class="avatar-circle">
       <p class="avatar-initial">{{ receiverName.charAt(0) | titlecase }}</p>
     </div>
@@ -9,20 +9,44 @@
       <!-- Add any additional user information here, such as status, etc. -->
     </div>
   </div>
-  
+
   <!-- Chat Messages Container -->
-  <div class="chat-messages-container"   *ngFor="let message of conversationHistory">
-    
-      <div 
-        [ngClass]="{
-          'chat-messages sender': message.senderId.toLowerCase() === loggedinUserId,
-          'chat-messages receiver': message.senderId.toLowerCase() !== loggedinUserId
-        }"
-      >
-      <div>{{message.time}}</div>
-        {{ message.content }}
+  <div
+    class="chat-messages-container"
+    #forScrolling
+    *ngFor="let message of conversationHistory"
+  >
+    <div
+      [ngClass]="{
+        'chat-messages sender':
+          message.senderId.toLowerCase() === loggedinUserId,
+        'chat-messages receiver':
+          message.senderId.toLowerCase() !== loggedinUserId
+      }"
+    >
+      <p class="message-content">{{ message.content }}</p>
+
+      <div class="message-meta">
+        <!-- <button class="edit-button" (click)="editMessage(message.id)">
+          <i class="bi bi-pen"></i>
+        </button> -->
+        <div class="edit-button">
+          <i class="bi bi-pen" (click)="editMessage(message.id)"></i>
+        </div>
+        <p class="message-timestamp">
+          {{ message.timestamp | date : "shortTime" }}
+        </p>
       </div>
-   
+
+      <!-- <button class="edit-button" (click)="editMessage(message.id)">Edit</button> -->
+
+      <div *ngIf="editingMessageId === message.id" class="editing-dialog">
+        <textarea [(ngModel)]="editedMessageContent"></textarea>
+        <div class="button-container">
+          <button class="save-button btn btn-success" (click)="saveEditedMessage()">Save</button>
+          <button class="cancel-button btn btn-danger" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-  

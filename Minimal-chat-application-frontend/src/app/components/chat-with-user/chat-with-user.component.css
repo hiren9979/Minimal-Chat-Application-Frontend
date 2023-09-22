@@ -15,14 +15,7 @@
   padding-right: 15px !important;
   /* overflow-y: auto; */
 }
-.chat{
-  /* overflow-y: scroll;
-  height: (80vh-60px) !important; */
-}
 
-.chat-list{
-  /* overflow-y: scroll; */
-}
 
 /* Sender */
 .sender {
@@ -46,18 +39,18 @@
 }
 
 .avatar-circle {
-  width: 50px; /* Set the width and height of the avatar */
+  width: 50px; 
   height: 50px;
   display: flex;
   border-radius: 50%;
   align-items: center;
   justify-content: center;
-  background-color: #020202; /* Set the background color of the circle */
+  background-color: #020202; 
 }
 
 .avatar-initial {
-  color: white; /* Set the text color of the initial */
-  font-size: 22px; /* Set the font size of the initial */
+  color: white; 
+  font-size: 22px; 
   font-weight: bold;
   margin-top: 15px;
 }
@@ -68,21 +61,20 @@
   align-items: center;
   padding: 10px;
   border-radius: 3px;
-  background-color: #a8c9ec; /* Header background color */
-  color: #fff; /* Header text color */
+  background-color: #a8c9ec;
+  color: #fff;
   margin-bottom: 15px;
-  position: sticky; /* Make the header sticky */
-  top: 0; /* Stick it to the top of the container */
-  z-index: 1; /* Ensure it appears above the scrolling content */
+  position: sticky; 
+  top: 0; 
+  z-index: 1; 
 }
 
 .chat-header-avatar {
   width: 40px;
   height: 40px;
-  background-color: #fff; /* Avatar background color */
-  border-radius: 50%; /* Circular avatar */
+  background-color: #fff; 
+  border-radius: 50%;
   margin-right: 10px;
-  /* You can add background-image and other styles for the avatar image here */
 }
 
 .chat-header-info h2 {
@@ -93,4 +85,63 @@
   font-weight: bold;
 }
 
-/* Additional styles for user information, status, etc. can be added here */
+
+
+/* CSS for message content */
+.message-content {
+  margin-bottom: 5px; 
+  font-size: 20px; 
+}
+
+/* CSS for message timestamp */
+.message-timestamp {
+  font-size: 12px; 
+  color: black; 
+  font-weight: bold;
+  text-align: end;
+  margin-bottom: 1px;
+}
+
+/* CSS for the editing dialog box */
+.editing-dialog {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 5px; /* Rounded corners for the dialog box */
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+/* Style for the textarea in the editing dialog */
+.editing-dialog textarea {
+  resize: vertical;
+  min-height: 78px;
+  border: 1px solid #dabebe;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px; /* Rounded corners for the textarea */
+  border-radius: 3px;
+  font-size: 16px; /* Adjust the font size as needed */
+}
+
+/* Style for the buttons in the editing dialog */
+
+.save-button{
+  background-color: blue;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center; 
+}
+
+.edit-button {
+  margin-right: 10px; 
+}
+
+
+.button-container {
+  display: flex;
+  justify-content: space-between; /* Space buttons evenly */
+  margin-top: 10px; /* Add margin for separation from textarea */
+}

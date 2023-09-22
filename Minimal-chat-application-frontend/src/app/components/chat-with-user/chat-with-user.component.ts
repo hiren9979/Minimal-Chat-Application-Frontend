@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ChangeDetectorRef, ElementRef, Component, HostListener,ViewChild , Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, ElementRef, Component, HostListener,ViewChild , Input, OnInit, OnChanges } from '@angular/core';
 import { AuthService } from 'src/app/service/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
@@ -18,8 +18,11 @@ export class ChatWithUserComponent implements OnInit{
     @Input() receiverName : string = '';
     loggedinUserId : string = '';
 
-// Add a ViewChild for the chatContainer element
- // Use the "Definite Assignment Assertion" (!)
+    editingMessageId: number | null = null; // Track the message being edited
+    editedMessageContent: string = ''; // Store the edited content
+  
+
+    @ViewChild('forScrolling') forScrolling!: ElementRef;
 
 
     constructor(
@@ -29,13 +32,6 @@ export class ChatWithUserComponent implements OnInit{
       private router: Router,
       private chatService : ChatService,
       private cdRef: ChangeDetectorRef,
-
-          
-    
-    
-      
-   
-
     ) {}
 
     ngOnInit(){
@@ -47,9 +43,75 @@ export class ChatWithUserComponent implements OnInit{
       }
       this.cdRef.detectChanges();
 
-
     }
 
-    
+    ngAfterViewChecked(): void {
+      // Detect changes and scroll to the bottom when new messages are added
+      this.cdRef.detectChanges();
+      this.scrollToBottom();
+    }
 
-}
+    scrollToBottom() {
+      if (this.forScrolling) {
+        const chatContainerElement = this.forScrolling.nativeElement;
+        chatContainerElement.scrollTop = chatContainerElement.scrollHeight;
+      }
+    }
+
+    editMessage(messageId: number) {
+      // Set the editingMessageId to the messageId to indicate which message is being edited
+      this.editingMessageId = messageId;
+      
+      // Find the message by messageId and set the editedMessageContent
+      const editedMessage = this.conversationHistory.find(message => message.id === messageId);
+      if (editedMessage) {
+        this.editedMessageContent = editedMessage.content;
+      }
+    }
+
+    saveEditedMessage() {
+
+       // Get the JWT token from AuthService
+       const token = this.authService.getToken();
+
+       if (token) {
+         // Create headers with the Authorization header containing the JWT token
+         const headers = new HttpHeaders({
+           Authorization: `Bearer ${token}`,
+         });
+         
+
+      if (this.editingMessageId !== null) {
+        // Call the EditMessage API with the edited content
+        this.chatService.editMessage(this.editingMessageId, this.editedMessageContent,headers).subscribe(
+          (response) => {
+            // Handle the success response, e.g., update the UI with the edited message.
+            console.log('Message edited successfully:', response);
+    
+            // Update the conversationHistory array with the edited message
+            const editedMessageIndex = this.conversationHistory.findIndex(message => message.id === this.editingMessageId);
+            if (editedMessageIndex !== -1) {
+              this.conversationHistory[editedMessageIndex].content = this.editedMessageContent;
+            }
+            
+            // Reset the editing state
+            this.editingMessageId = null;
+            this.editedMessageContent = '';
+          },
+          (error) => {
+            // Handle the error response, e.g., display an error message.
+            console.error('Error editing message:', error);
+          }
+        );
+      }
+    }
+  }
+    
+  cancelEdit() {
+      // Reset the editing state when the user cancels editing
+      this.editingMessageId = null;
+      this.editedMessageContent = '';
+    }
+
+  }
+

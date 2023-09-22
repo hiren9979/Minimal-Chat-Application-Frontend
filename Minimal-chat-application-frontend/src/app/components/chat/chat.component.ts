@@ -188,7 +188,10 @@ export class ChatComponent implements OnInit {
         (response) => {
           console.log('Message Sent successful:', response);
           this.toastr.success('Message sent successful!', 'Success');
-         
+          this.time = new Date();
+          this.wholeConversation = [];
+          this.fetchConversationHistory(); 
+          this.sendMessageForm.reset();
         },
         (error) => {
           this.toastr.error('Message Sent failed!', 'Error');

@@ -21,7 +21,7 @@
     style="overflow-y: scroll;" (scroll)="onScroll($event)" >
       <chat-with-user [conversationHistory]="wholeConversation"  [receiverName]="receiverName"></chat-with-user>
     </div>
-  
+
     <div class="chat-input">
       <form [formGroup]="sendMessageForm" (ngSubmit)="onSubmit()">
         <input type="text"  placeholder="Type your message..."  name="message" formControlName="messageText" required />
