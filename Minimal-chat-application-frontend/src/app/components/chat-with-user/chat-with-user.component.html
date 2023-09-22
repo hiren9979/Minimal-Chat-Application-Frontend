@@ -11,7 +11,7 @@
   </div>
   
   <!-- Chat Messages Container -->
-  <div class="chat-messages-container"   *ngFor="let message of conversationHistory">
+  <div class="chat-messages-container" #forScrolling   *ngFor="let message of conversationHistory">
     
       <div 
         [ngClass]="{
@@ -19,9 +19,8 @@
           'chat-messages receiver': message.senderId.toLowerCase() !== loggedinUserId
         }"
       >
-      <div>{{message.time}}</div>
-        {{ message.content }}
-      </div>
+      <p class="message-content">{{ message.content }}</p>
+      <p class="message-timestamp">{{ message.timestamp | date:'shortTime' }}</p>
    
   </div>
 </div>

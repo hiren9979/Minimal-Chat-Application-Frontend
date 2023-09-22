@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ChangeDetectorRef, ElementRef, Component, HostListener,ViewChild , Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, ElementRef, Component, HostListener,ViewChild , Input, OnInit, OnChanges } from '@angular/core';
 import { AuthService } from 'src/app/service/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
@@ -18,8 +18,7 @@ export class ChatWithUserComponent implements OnInit{
     @Input() receiverName : string = '';
     loggedinUserId : string = '';
 
-// Add a ViewChild for the chatContainer element
- // Use the "Definite Assignment Assertion" (!)
+    @ViewChild('forScrolling') forScrolling!: ElementRef;
 
 
     constructor(
@@ -29,13 +28,6 @@ export class ChatWithUserComponent implements OnInit{
       private router: Router,
       private chatService : ChatService,
       private cdRef: ChangeDetectorRef,
-
-          
-    
-    
-      
-   
-
     ) {}
 
     ngOnInit(){
@@ -47,9 +39,18 @@ export class ChatWithUserComponent implements OnInit{
       }
       this.cdRef.detectChanges();
 
-
     }
 
-    
+    ngAfterViewChecked(): void {
+      // Detect changes and scroll to the bottom when new messages are added
+      this.cdRef.detectChanges();
+      this.scrollToBottom();
+    }
 
+    scrollToBottom() {
+      if (this.forScrolling) {
+        const chatContainerElement = this.forScrolling.nativeElement;
+        chatContainerElement.scrollTop = chatContainerElement.scrollHeight;
+      }
+    }
 }
