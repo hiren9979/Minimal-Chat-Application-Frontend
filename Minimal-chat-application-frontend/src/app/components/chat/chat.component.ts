@@ -5,6 +5,13 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { ChatService } from 'src/app/service/chat.service';
 import { FormBuilder, FormGroup , Validators} from '@angular/forms';
+import { ClassProvider, FactoryProvider, InjectionToken, PLATFORM_ID } from '@angular/core';
+import { Inject } from '@angular/core';
+
+/* Create a new injection token for injecting the window into a component. */
+export const WINDOW = new InjectionToken('WindowToken');
+
+
 
 @Component({
   selector: 'app-chat',
@@ -13,26 +20,38 @@ import { FormBuilder, FormGroup , Validators} from '@angular/forms';
 })
 export class ChatComponent implements OnInit {
 
+  @ViewChild('chatContainer', { static: false }) chatContainer!: ElementRef;
+
+
   sendMessageForm!: FormGroup;
 
   userList: any[] = [];
   selectedUser: any = null; // To store the selected user
   messageText: string = ''; // To store the message text
   conversationHistory : any[] =  [];  //To store the conversation history with user
+  wholeConversation : any[] = []; //To store the whole conversation
   receiverName : string = '';
   receiverId : string = '';
+  time = new Date(); 
+
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
     private authService: AuthService,
     private toastr: ToastrService,
     private router: Router,
-    private chatService : ChatService
-    
+    private chatService : ChatService,
+    @Inject(WINDOW) private window: Window,
+
   ) {}
 
   ngOnInit(): void {
     this.fetchUserList();
+
+    // this.chatMessages.nativeElement.addEventListener('scroll', () => {
+    //   this.onScroll();
+    // });
+
     this.sendMessageForm = this.fb.group({
       messageText: ['', [Validators.required]],
     });
@@ -68,10 +87,10 @@ export class ChatComponent implements OnInit {
     }
   }
 
+
   fetchConversationHistory(){
     var senderId;
     const sort = 'asc'; 
-    const time = new Date(); 
     var count = 20;
     
     if (this.selectedUser) {
@@ -96,11 +115,20 @@ export class ChatComponent implements OnInit {
       
 
       // Use your chat service to fetch conversation history
-      this.chatService.getConversationHistory(senderId, this.receiverId, sort, time, count,headers).subscribe(
+      this.chatService.getConversationHistory(senderId, this.receiverId, sort, this.time, count,headers).subscribe(
         (response) => {
-          this.conversationHistory = response.messages;
+          this.conversationHistory = response.messages.reverse();
+          console.log(this.conversationHistory);
+          
+         // Prepend conversationHistory to wholeConversation
+         this.wholeConversation.unshift(...this.conversationHistory);
+
+          this.time = new Date(response.messages[0].timestamp);
+          console.log(this.time);
+
           console.log("fetched" , this.conversationHistory);
           this.toastr.success('Conversation history retrieved!', 'Success');
+          
           console.log('Conversation history:', response);
           
         },
@@ -112,5 +140,62 @@ export class ChatComponent implements OnInit {
   }
   }
 
+  // @HostListener('window:scroll', ['$event'])
+  //   onScroll(event: Event) {
+  //     console.log("Scroll event triggered");
+  //     const scrollY = this.window.scrollY;
+  
+  //     if (this.chatContainer) {
+  //       const chatContainerElement = this.chatContainer.nativeElement;
+  //       const threshold = 100;
+  
+  //       if (scrollY <= threshold) {
+  //         alert("calledd");
+  //         console.log('Scroll event triggered inside chatContainer');
+  //       }
+  //     }
+  //   }
 
+  @HostListener('scroll', ['$event'])
+  onScroll(event: Event){
+    console.log('Scroll event detected');
+    const element = event.target as HTMLElement;
+    if(element.scrollTop === 0){
+       this.fetchConversationHistory();
+      
+    }
+  }
+
+  onSubmit()
+  {
+    console.log(this.sendMessageForm.value);
+    console.log(this.receiverId);
+    if(this.sendMessageForm.valid)
+    {
+      const msg = this.sendMessageForm.value;
+     
+      // Get the JWT token from AuthService
+    const token = this.authService.getToken();
+
+    if (token) {
+      // Create headers with the Authorization header containing the JWT token
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      });
+
+      this.chatService.sendMessageToUser(msg,this.receiverId,headers).subscribe(
+        (response) => {
+          console.log('Message Sent successful:', response);
+          this.toastr.success('Message sent successful!', 'Success');
+         
+        },
+        (error) => {
+          this.toastr.error('Message Sent failed!', 'Error');
+          console.log('Message Sent failed:', error);
+        }
+      );
+    }
+  }
+  }
 }

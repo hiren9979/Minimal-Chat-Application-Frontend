@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { WINDOW } from './components/chat/chat.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { RegisterComponent } from './components/register/register.component';
@@ -43,6 +43,10 @@ import { ChatWithUserComponent } from './components/chat-with-user/chat-with-use
   providers: [
     provideAnimations(), // required animations providers
     provideToastr(), // Toastr providers
+    {
+      provide: WINDOW,
+    useValue: window,
+    }
   ],
   bootstrap: [AppComponent]
 })

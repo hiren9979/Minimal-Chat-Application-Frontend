@@ -38,5 +38,16 @@ export class ChatService {
   }
 
   // Create a method to send a message to a specific user
+  sendMessageToUser(message: any,receiverId:string,headers:HttpHeaders): Observable<any> {
+    const body = {
+      ReceiverId: receiverId,
+      Content: message.messageText
+    };
+
+      const options = {body,headers}
+
+      // Make a POST request to send the message
+      return this.http.post(`${this.apiUrl}/SendMessages`, body,{headers});
+  }
 
 }

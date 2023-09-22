@@ -1,4 +1,5 @@
 <!-- Chat Header -->
+<div class="chat">
 <div *ngIf="receiverName" class="chat-header">
     <div class="avatar-circle">
       <p class="avatar-initial">{{ receiverName.charAt(0) | titlecase }}</p>
@@ -10,8 +11,8 @@
   </div>
   
   <!-- Chat Messages Container -->
-  <div class="chat-messages-container">
-    <div class="messages" *ngFor="let message of conversationHistory">
+  <div class="chat-messages-container"   *ngFor="let message of conversationHistory">
+    
       <div 
         [ngClass]="{
           'chat-messages sender': message.senderId.toLowerCase() === loggedinUserId,
@@ -21,6 +22,7 @@
       <div>{{message.time}}</div>
         {{ message.content }}
       </div>
-    </div>
+   
   </div>
+</div>
   

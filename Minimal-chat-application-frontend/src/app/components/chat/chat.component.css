@@ -1,7 +1,7 @@
 
 .chat-container {
     display: flex;
-    height: 100vh; 
+    height: 90vh; 
   }
   
 
@@ -26,7 +26,7 @@
   /* Style for chat messages, adjust as needed */
   .chat-messages {
     flex-grow: 1;
-    overflow-y: auto; /* Enable scrolling if the content overflows */
+    overflow-y: scroll; 
   }
   
   /* Style for the chat input field and send button */

@@ -1,9 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, ElementRef, Component, HostListener,ViewChild , Input, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/service/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { ChatService } from 'src/app/service/chat.service';
+
+
 
 
 @Component({
@@ -16,14 +18,24 @@ export class ChatWithUserComponent implements OnInit{
     @Input() receiverName : string = '';
     loggedinUserId : string = '';
 
+// Add a ViewChild for the chatContainer element
+ // Use the "Definite Assignment Assertion" (!)
+
+
     constructor(
       private http: HttpClient,
       private authService: AuthService,
       private toastr: ToastrService,
       private router: Router,
       private chatService : ChatService,
-      private cdRef: ChangeDetectorRef
+      private cdRef: ChangeDetectorRef,
+
+          
+    
+    
       
+   
+
     ) {}
 
     ngOnInit(){
@@ -35,6 +47,9 @@ export class ChatWithUserComponent implements OnInit{
       }
       this.cdRef.detectChanges();
 
+
     }
+
+    
 
 }
