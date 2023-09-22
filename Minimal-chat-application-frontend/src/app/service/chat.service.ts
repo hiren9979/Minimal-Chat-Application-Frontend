@@ -50,4 +50,13 @@ export class ChatService {
       return this.http.post(`${this.apiUrl}/SendMessages`, body,{headers});
   }
 
+  editMessage(messageId: number, editedContent: string, headers: HttpHeaders): Observable<any> {
+    const body = {
+      Content: editedContent
+    };
+
+    // Make a POST request to edit the message
+    return this.http.post(`${this.apiUrl}/EditMessage/${messageId}`, body, { headers });
+  }
+
 }

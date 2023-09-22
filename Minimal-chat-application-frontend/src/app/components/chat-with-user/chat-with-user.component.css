@@ -101,3 +101,47 @@
   text-align: end;
   margin-bottom: 1px;
 }
+
+/* CSS for the editing dialog box */
+.editing-dialog {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 5px; /* Rounded corners for the dialog box */
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+/* Style for the textarea in the editing dialog */
+.editing-dialog textarea {
+  resize: vertical;
+  min-height: 78px;
+  border: 1px solid #dabebe;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px; /* Rounded corners for the textarea */
+  border-radius: 3px;
+  font-size: 16px; /* Adjust the font size as needed */
+}
+
+/* Style for the buttons in the editing dialog */
+
+.save-button{
+  background-color: blue;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center; 
+}
+
+.edit-button {
+  margin-right: 10px; 
+}
+
+
+.button-container {
+  display: flex;
+  justify-content: space-between; /* Space buttons evenly */
+  margin-top: 10px; /* Add margin for separation from textarea */
+}

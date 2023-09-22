@@ -15,6 +15,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginComponent } from './components/login/login.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { ChatWithUserComponent } from './components/chat-with-user/chat-with-user.component';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
 
 
 @NgModule({
@@ -33,6 +34,7 @@ import { ChatWithUserComponent } from './components/chat-with-user/chat-with-use
     ReactiveFormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    FormsModule,
     ToastrModule.forRoot(
       {
         timeOut: 3000, // Duration for which the toast will be shown (in milliseconds)
