@@ -59,4 +59,9 @@ export class ChatService {
     return this.http.post(`${this.apiUrl}/EditMessage/${messageId}`, body, { headers });
   }
 
+  deleteMessage(messageId: number, headers: HttpHeaders): Observable<any> {
+    // Make a DELETE request to delete the message
+    return this.http.delete(`${this.apiUrl}/DeleteMessage/${messageId}`, { headers });
+  }
+
 }

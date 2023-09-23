@@ -113,5 +113,35 @@ export class ChatWithUserComponent implements OnInit{
       this.editedMessageContent = '';
     }
 
+    deleteMessage(messageId: number) {
+      // Get the JWT token from AuthService
+      const token = this.authService.getToken();
+  
+      if (token) {
+        // Create headers with the Authorization header containing the JWT token
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${token}`,
+        });
+  
+        // Call the DeleteMessage API with the message ID
+        this.chatService.deleteMessage(messageId, headers).subscribe(
+          (response) => {
+            // Handle the success response, e.g., remove the deleted message from conversationHistory.
+            console.log('Message deleted successfully:', response);
+            this.toastr.success("Message deleted successfully",'success');
+            // Find the index of the deleted message in conversationHistory
+            const deletedMessageIndex = this.conversationHistory.findIndex((message) => message.id === messageId);
+            if (deletedMessageIndex !== -1) {
+              this.conversationHistory.splice(deletedMessageIndex, 1); // Remove the message
+            }
+          },
+          (error) => {
+            this.toastr.error('Error while delete message','error');
+            console.error('Error deleting message:', error);
+          }
+        );
+      }
+
   }
 
+}

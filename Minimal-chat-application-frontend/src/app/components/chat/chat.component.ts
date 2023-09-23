@@ -60,6 +60,8 @@ export class ChatComponent implements OnInit {
   startChat(user: any) {
     // Set the selected user when a user is clicked
     this.selectedUser = user;
+    this.wholeConversation = [];
+    this.conversationHistory = [];
     console.log(this.selectedUser);
     this.fetchConversationHistory();
   }

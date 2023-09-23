@@ -13,6 +13,7 @@
   align-items: flex-start; /* Align items to the left */
   justify-content: flex-start; /* Align content to the top */
   padding-right: 15px !important;
+  justify-content: flex-end;
   /* overflow-y: auto; */
 }
 
@@ -25,11 +26,12 @@
   padding: 5px 15px; 
   display: inline-block;
   margin-bottom: 5px ;
-  margin-left: 730px;
+  /* margin-left: 730px; */
+  margin-left: auto;
 }
 
 /* Receiver */
-.receiver {
+.receiver { 
   background-color: rgb(122, 204, 241);
   color: #000;
   border-radius: 10px;
@@ -132,7 +134,8 @@
 
 .message-meta {
   display: flex;
-  align-items: center; 
+  align-items: center;
+  justify-content: flex-end; 
 }
 
 .edit-button {
