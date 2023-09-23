@@ -30,7 +30,7 @@
         <!-- <button class="edit-button" (click)="editMessage(message.id)">
           <i class="bi bi-pen"></i>
         </button> -->
-        <div class="edit-button">
+        <div class="edit-button" *ngIf="message.senderId === loggedinUserId">
           <i class="bi bi-pen" (click)="editMessage(message.id)"></i>
         </div>
         <p class="message-timestamp">
@@ -45,6 +45,9 @@
         <div class="button-container">
           <button class="save-button btn btn-success" (click)="saveEditedMessage()">Save</button>
           <button class="cancel-button btn btn-danger" (click)="cancelEdit()">Cancel</button>
+          <button class="delete-button btn btn-danger"
+          (click)="deleteMessage(message.id)"
+           >Delete</button>
         </div>
       </div>
     </div>
