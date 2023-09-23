@@ -1,0 +1,64 @@
+<!-- requestlog.component.html -->
+
+<p>requestlog works!</p>
+<div class="log-filter">
+  <label for="timeRange" class="label">Time Range :</label>
+  <select id="timeRange" [(ngModel)]="selectedTimeRange" class="custom-select">
+    <option value="5" (click)="handleTimeRangeClick(5)">Last 5 mins</option>
+    <option value="10" (click)="handleTimeRangeClick(10)">Last 10 mins</option>
+    <option value="30" (click)="handleTimeRangeClick(30)">Last 30 mins</option>
+    <option value="custom">Custom</option>
+  </select>
+  
+  <!-- Custom Time Range Picker -->
+  <div *ngIf="selectedTimeRange === 'custom'" class="custom-time-range">
+    <label for="startTime" class="label">Start Time :</label>
+    <input type="datetime-local" id="startTime" [(ngModel)]="startTime" class="date-input">
+    <label for="endTime" class="label">End Time :</label>
+    <input type="datetime-local" id="endTime" [(ngModel)]="endTime" class="date-input">
+  </div>
+
+  <label for="columns" class="label">Columns :</label>
+  <div id="columns">
+    <label>
+      <input type="checkbox" [(ngModel)]="showId"> Id
+    </label>
+    <label>
+      <input type="checkbox" [(ngModel)]="showIpAddress"> Ip Address
+    </label>
+    <label>
+      <input type="checkbox" [(ngModel)]="showTimestamp"> Timestamp
+    </label>
+    <label>
+      <input type="checkbox" [(ngModel)]="showUsername"> UserName
+    </label>
+    <label>
+      <input type="checkbox" [(ngModel)]="showRequestBody"> RequestBody
+    </label>
+  </div>
+
+  <button class="btn btn-primary" (click)="fetchLogs()">Fetch Logs</button>
+</div>
+
+<div class="log-list">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col" *ngIf="showId">Id</th>
+        <th scope="col" *ngIf="showIpAddress">Ip Address</th>
+        <th scope="col" *ngIf="showTimestamp">Timestamp</th>
+        <th scope="col" *ngIf="showUsername">UserName</th>
+        <th scope="col" *ngIf="showRequestBody">RequestBody</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of logs">
+        <td class="column" *ngIf="showId">{{ log.id }}</td>
+        <td class="column" *ngIf="showIpAddress">{{ log.ipAddress }}</td>
+        <td class="column" *ngIf="showTimestamp">{{ log.timestamp }}</td>
+        <td class="column" *ngIf="showUsername">{{ log.username }}</td>
+        <td class="column" *ngIf="showRequestBody">{{ log.requestBody }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

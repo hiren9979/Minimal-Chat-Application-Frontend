@@ -1,55 +1,71 @@
 <!-- Chat Header -->
 <div class="chat">
   <div *ngIf="receiverName" class="chat-header">
-    <div class="avatar-circle">
-      <p class="avatar-initial">{{ receiverName.charAt(0) | titlecase }}</p>
-    </div>
-    <div class="chat-header-info">
-      <h2>{{ receiverName | titlecase }}</h2>
-      <!-- Add any additional user information here, such as status, etc. -->
-    </div>
+     <div class="avatar-circle">
+        <p class="avatar-initial">{{ receiverName.charAt(0) | titlecase }}</p>
+     </div>
+     <div class="chat-header-info">
+        <h2>{{ receiverName | titlecase }}</h2>
+        <!-- Add any additional user information here, such as status, etc. -->
+     </div>
   </div>
-
   <!-- Chat Messages Container -->
   <div
-    class="chat-messages-container"
-    #forScrolling
-    *ngFor="let message of conversationHistory"
-  >
-    <div
-      [ngClass]="{
+     class="chat-messages-container"
+     #forScrolling
+     *ngFor="let message of conversationHistory"
+     >
+     <div
+        [ngClass]="{
         'chat-messages sender':
-          message.senderId.toLowerCase() === loggedinUserId,
+        message.senderId.toLowerCase() === loggedinUserId,
         'chat-messages receiver':
-          message.senderId.toLowerCase() !== loggedinUserId
-      }"
-    >
-      <p class="message-content">{{ message.content }}</p>
-
-      <div class="message-meta">
-        <!-- <button class="edit-button" (click)="editMessage(message.id)">
-          <i class="bi bi-pen"></i>
-        </button> -->
-        <div class="edit-button" *ngIf="message.senderId === loggedinUserId">
-          <i class="bi bi-pen" (click)="editMessage(message.id)"></i>
+        message.senderId.toLowerCase() !== loggedinUserId
+        }"
+        >
+        <p class="message-content">{{ message.content }}</p>
+        <div class="message-meta">
+           <!-- <button class="edit-button" (click)="editMessage(message.id)">
+              <i class="bi bi-pen"></i>
+              </button> -->
+           <div class="edit-button" *ngIf="message.senderId === loggedinUserId">
+              <i class="bi bi-pen" (click)="openPopUp(message.id)"></i>
+           </div>
+           <p class="message-timestamp">
+              {{ message.timestamp | date : "shortTime" }}
+           </p>
         </div>
-        <p class="message-timestamp">
-          {{ message.timestamp | date : "shortTime" }}
-        </p>
-      </div>
-
-      <!-- <button class="edit-button" (click)="editMessage(message.id)">Edit</button> -->
-
-      <div *ngIf="editingMessageId === message.id" class="editing-dialog">
-        <textarea [(ngModel)]="editedMessageContent"></textarea>
-        <div class="button-container">
-          <button class="save-button btn btn-success" (click)="saveEditedMessage()">Save</button>
-          <button class="cancel-button btn btn-danger" (click)="cancelEdit()">Cancel</button>
-          <button class="delete-button btn btn-danger"
-          (click)="deleteMessage(message.id)"
-           >Delete</button>
+        <!-- bootstrap popup -->
+        <div
+        *ngIf="isOpenPopUp && editingMessageId === message.id"
+        [attr.id]="'modalSubscriptionForm_' + message.id"
+        tabindex="-1"
+        class="modal fade custom-modal-animation"
+        role="dialog"
+        aria-labelledby="myModalLabel"
+        aria-hidden="true"
+        >
+        <div *ngIf="editingMessageId === message.id" class="editing-dialog">
+          <input type="text" [(ngModel)]="editedMessageContent" class="edit-input" aria-label="Default" />
+          <div class="button-container">
+              <button
+                 class="save-button btn btn-success"
+                 (click)="saveEditedMessage()"
+                 >
+              Save
+              </button>
+              <button class="cancel-button btn btn-danger" (click)="cancelEdit()">
+              Cancel
+              </button>
+              <button
+                 class="delete-button btn btn-danger"
+                 (click)="deleteMessage(message.id)"
+                 >
+              Delete
+              </button>
+           </div>
         </div>
-      </div>
-    </div>
+     </div>
   </div>
+</div>
 </div>
