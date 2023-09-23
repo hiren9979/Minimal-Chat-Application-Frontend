@@ -16,9 +16,17 @@ import { LoginComponent } from './components/login/login.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { ChatWithUserComponent } from './components/chat-with-user/chat-with-user.component';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { RequestlogComponent } from './components/requestlog/requestlog.component';
+import { ErrorComponent } from './components/error/error.component';
 
 
 @NgModule({
+  exports: [FormsModule, MatDialogModule, MatFormFieldModule, MatButtonModule, MatInputModule],
+
   declarations: [
     AppComponent,
     RegisterComponent,
@@ -26,7 +34,9 @@ import { FormsModule } from '@angular/forms'; // Import FormsModule
     NavbarComponent,
     LoginComponent,
     ChatComponent,
-    ChatWithUserComponent
+    ChatWithUserComponent,
+    RequestlogComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,
@@ -34,6 +44,7 @@ import { FormsModule } from '@angular/forms'; // Import FormsModule
     ReactiveFormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    MatDialogModule,
     FormsModule,
     ToastrModule.forRoot(
       {

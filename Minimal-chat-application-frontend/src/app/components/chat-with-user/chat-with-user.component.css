@@ -110,6 +110,8 @@
   border: 1px solid #ccc;
   padding: 15px;
   margin-top: 10px;
+  height: 140px;
+  width: 260px;
   border-radius: 5px; /* Rounded corners for the dialog box */
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
 }
@@ -120,6 +122,7 @@
   min-height: 78px;
   border: 1px solid #dabebe;
   padding: 10px;
+  border-radius: 3px;
   margin-bottom: 10px;
   border-radius: 5px; /* Rounded corners for the textarea */
   border-radius: 3px;
@@ -130,6 +133,7 @@
 
 .save-button{
   background-color: blue;
+  margin-right: 5px;
 }
 
 .message-meta {
@@ -142,9 +146,32 @@
   margin-right: 10px; 
 }
 
+.cancel-button {
+  margin-right: 5px;
+}
+
+.edit-input{
+  width: 100%;
+  margin-top: 10px;
+}
 
 .button-container {
   display: flex;
   justify-content: space-between; /* Space buttons evenly */
-  margin-top: 10px; /* Add margin for separation from textarea */
+  margin-top: 25px; /* Add margin for separation from textarea */
 }
+
+.custom-modal-animation {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translate(0, -50px); /* Start from top */
+  opacity: 1;
+}
+
+.custom-modal-animation.show {
+  transform: translate(0, 0); /* Centered */
+  opacity: 1;
+}
+

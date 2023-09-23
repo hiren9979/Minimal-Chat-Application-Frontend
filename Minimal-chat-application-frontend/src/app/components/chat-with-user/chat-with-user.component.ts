@@ -7,7 +7,6 @@ import { ChatService } from 'src/app/service/chat.service';
 
 
 
-
 @Component({
   selector: 'chat-with-user',
   templateUrl: './chat-with-user.component.html',
@@ -17,6 +16,7 @@ export class ChatWithUserComponent implements OnInit{
     @Input() conversationHistory : any[] = [];
     @Input() receiverName : string = '';
     loggedinUserId : string = '';
+    isOpenPopUp : boolean = false;
 
     editingMessageId: number | null = null; // Track the message being edited
     editedMessageContent: string = ''; // Store the edited content
@@ -142,6 +142,19 @@ export class ChatWithUserComponent implements OnInit{
         );
       }
 
+  }
+
+  openPopUp(messageId : number)
+  {
+      this.isOpenPopUp = true;
+      // Set the editingMessageId to the messageId to indicate which message is being edited
+      this.editingMessageId = messageId;
+      
+      // Find the message by messageId and set the editedMessageContent
+      const editedMessage = this.conversationHistory.find(message => message.id === messageId);
+      if (editedMessage) {
+        this.editedMessageContent = editedMessage.content;
+      }
   }
 
 }

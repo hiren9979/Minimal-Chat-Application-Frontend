@@ -23,16 +23,14 @@
     </div>
 
     <div class="chat-input">
-      <form [formGroup]="sendMessageForm" (ngSubmit)="onSubmit()">
-        <input type="text"  placeholder="Type your message..."  name="message" formControlName="messageText" required />
-        <small *ngIf="sendMessageForm?.get('messageText')?.hasError('required') 
-        && sendMessageForm?.get('messageText')?.touched" style="color: red;">
-        *Message is required
-      </small>
-
-        <button type="submit">Send</button>
+      <form [formGroup]="sendMessageForm" (ngSubmit)="onSubmit()" style="display: flex;">
+        <input type="text" class="sendMessage-input" placeholder="Type your message..." name="message" formControlName="messageText" required style="flex: 1;" />
+        <button  class="send-button"  type="submit" style="align-self: flex-end;">Send</button>
       </form>
-    </div>	
+    </div>
+    <small *ngIf="sendMessageForm?.get('messageText')?.hasError('required') && sendMessageForm?.get('messageText')?.touched" style="color: red;">
+      *Message is required
+    </small>
 
   </div>
   

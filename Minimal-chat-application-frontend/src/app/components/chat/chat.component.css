@@ -133,3 +133,10 @@
   font-size: 16px;
   margin-left: 18px;
 }
+
+.sendMessage-input{
+  width: 700px;
+}
+.send-button{
+  justify-content: flex-end;
+}

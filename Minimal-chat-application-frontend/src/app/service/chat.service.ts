@@ -32,8 +32,6 @@ export class ChatService {
       .set('time', time.toISOString())
       .set('count', count.toString());
 
-    const options = { headers, params };
-
       return this.http.get(`${this.apiUrl}/ConversationHistory`, { headers,params });
   }
 

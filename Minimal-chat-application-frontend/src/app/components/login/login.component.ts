@@ -37,10 +37,9 @@ export class LoginComponent {
           localStorage.setItem('user', JSON.stringify(response));
 
           this.toastr.success('Login successful!', 'Success');
-          this.router.navigate(['/home']);
+          this.router.navigate(['/chat']);
         },
         (error) => {
-          alert("failed login");
           this.toastr.error('Login failed!', 'Error');
           console.log('Login failed:', error);
         }
