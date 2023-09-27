@@ -1,38 +1,35 @@
-<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-<div class="container">
-    <div class="center">
-        <h1>Register</h1>
-            <div class="txt_field">
-                <input type="text" placeholder="firstname" formControlName="firstName" required>
-                <span></span>
-                <small *ngIf="signupForm.get('firstName')?.hasError('required') && signupForm.get('firstName')?.touched" style="color: red;">*First Name is required</small>
 
-            </div>
-            <div class="txt_field">
-                <input type="text" placeholder="lastname" formControlName="lastName" required>
-                <span></span>
-                <small *ngIf="signupForm.get('lastName')?.hasError('required') && signupForm.get('lastName')?.touched" style="color: red;">*Last Name is required</small>
-
-            </div>
-            <div class="txt_field">
-                <input type="email" placeholder="email" formControlName="email"  required>
-                <span></span>
-                <small *ngIf="signupForm.get('email')?.hasError('required') && signupForm.get('email')?.touched" style="color: red;">*Email address is required</small>
-                <small *ngIf="signupForm.get('email')?.hasError('email') && signupForm.get('email')?.touched" style="color: red;">*Invalid email format</small>
-    
-            </div>
-            <div class="txt_field">
-                <input type="password" placeholder="password" formControlName="password"  required>
-                <span></span>
-                <small *ngIf="signupForm.get('password')?.hasError('required') && signupForm.get('password')?.touched" style="color: red;">*Password is required</small>
-                <small *ngIf="signupForm.get('password')?.hasError('minlength') && signupForm.get('password')?.touched" style="color: red;">*Password must be at least 6 characters long</small>
-    
-            </div>
-
-            <button type="submit" class="btn btn-primary">submit</button>
-            <div class="signup_link">
-                Have an Account ? 
-            </div>
-    </div>
-</div>
-</form>
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <div class="container">
+        <div class="center">
+          <h1>Register</h1>
+          <div class="txt_field">
+            <input type="text" placeholder="First Name" formControlName="firstName" required>
+            <span></span>
+            <small *ngIf="signupForm.get('firstName')?.hasError('required') && signupForm.get('firstName')?.touched" style="color: red;">*First Name is required</small>
+          </div>
+          <div class="txt_field">
+            <input type="text" placeholder="Last Name" formControlName="lastName" required>
+            <span></span>
+            <small *ngIf="signupForm.get('lastName')?.hasError('required') && signupForm.get('lastName')?.touched" style="color: red;">*Last Name is required</small>
+          </div>
+          <div class="txt_field">
+            <input type="email" placeholder="Email" formControlName="email" required>
+            <span></span>
+            <small *ngIf="signupForm.get('email')?.hasError('required') && signupForm.get('email')?.touched" style="color: red;">*Email address is required</small>
+            <small *ngIf="signupForm.get('email')?.hasError('email') && signupForm.get('email')?.touched" style="color: red;">*Invalid email format</small>
+          </div>
+          <div class="txt_field">
+            <input type="password" placeholder="Password" formControlName="password" required>
+            <span></span>
+            <small *ngIf="signupForm.get('password')?.hasError('required') && signupForm.get('password')?.touched" style="color: red;">*Password is required</small>
+            <small *ngIf="signupForm.get('password')?.hasError('minlength') && signupForm.get('password')?.touched" style="color: red;">*Password must be at least 6 characters long</small>
+          </div>
+          <button type="submit">Submit</button>
+          <div class="signup_link">
+            Have an Account?
+          </div>
+        </div>
+      </div>
+    </form>
+  

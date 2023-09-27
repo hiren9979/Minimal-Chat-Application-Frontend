@@ -13,15 +13,19 @@ export class AuthGuard implements CanActivate {
 
   canActivate(): boolean {
     // Check if a valid token is present in local storage
-    const token = localStorage.getItem('user');
-    console.log(token);
-    if (token) {
-      return true;
-    } else {
-      // Token is not present, redirect to the login page
-      this.toastr.error('Please login first','Error');
+
+    const user = localStorage.getItem('user');
+    if (user) {
+      const jsonObject = JSON.parse(user);
+      if(jsonObject.token===null) {
+        this.toastr.error("Authorization failed - Token null", 'error');
+        this.toastr.error('Please login first','Error');
       this.router.navigate(['/login']);
       return false;
+      }
+      else
+        return true;
     }
+    return true;
   }
 }
