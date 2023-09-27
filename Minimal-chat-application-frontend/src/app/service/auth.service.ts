@@ -10,12 +10,11 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class AuthService {
 
-  private apiUrl = 'https://localhost:7275/api/User';
+  private apiUrl = 'https://localhost:7288/api/User';
 
   constructor(
     private http: HttpClient,
     private toastr : ToastrService,
-
     ) { }
 
   signup(user:any):Observable<any>{
@@ -25,6 +24,14 @@ export class AuthService {
   login(user:any):Observable<any>{
       return this.http.post(`${this.apiUrl}/Login`,user);
   }
+
+  loginWithGoogle(credential: string) {
+  const header = new HttpHeaders().set('Content-type', 'application/json');
+
+  return this.http.post(`${this.apiUrl}/LoginWithGoogle`, JSON.stringify(credential), { headers: header, withCredentials: true });
+  }
+  
+ 
 
   getUserList(headers: HttpHeaders):Observable<any>{
     return this.http.get(`${this.apiUrl}/GetUsers`, { headers});
