@@ -8,6 +8,11 @@
         <h2>{{ receiverName | titlecase }}</h2>
         <!-- Add any additional user information here, such as status, etc. -->
      </div>
+     <!-- Add this input field where users can enter their search query -->
+<div class="search-bar">
+   <input type="text" [(ngModel)]="searchQuery" placeholder="Search messages" (keyup)="searchMessages()" />
+ </div>
+ 
   </div>
   <!-- Chat Messages Container -->
   <div

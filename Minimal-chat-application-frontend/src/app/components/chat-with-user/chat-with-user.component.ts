@@ -17,7 +17,13 @@ export class ChatWithUserComponent implements OnInit{
     @Input() receiverName : string = '';
     loggedinUserId : string = '';
     isOpenPopUp : boolean = false;
+    searchText: string = '';
+    originalMessages: any[] = this.conversationHistory;
 
+    searchQuery: string = '';
+    // Define a property to store the search results
+    searchResults: any[] = [];
+   
     editingMessageId: number | null = null; // Track the message being edited
     editedMessageContent: string = ''; // Store the edited content
   
@@ -41,8 +47,26 @@ export class ChatWithUserComponent implements OnInit{
         this.loggedinUserId = jsonObject.profile.id; 
         console.log("LoggedInUserId : ",this.loggedinUserId);
       }
+      this.originalMessages = this.conversationHistory.slice();
       this.cdRef.detectChanges();
 
+    }
+
+    private handleEditedMessage(editedMessage: any): void {
+      const index = this.conversationHistory.findIndex((message) => message.id === editedMessage.id);
+  
+      if (index !== -1) {
+        this.conversationHistory[index].content = editedMessage.content;
+      }
+    }
+  
+    // Method to handle incoming deleted messages from SignalR
+    private handleDeletedMessage(deletedMessageId: number): void {
+      const index = this.conversationHistory.findIndex((message) => message.id === deletedMessageId);
+  
+      if (index !== -1) {
+        this.conversationHistory.splice(index, 1);
+      }
     }
 
     ngAfterViewChecked(): void {
@@ -58,6 +82,23 @@ export class ChatWithUserComponent implements OnInit{
       }
     }
 
+    searchMessages() {
+      if (this.searchQuery.trim() === '') {
+        this.searchResults = [];
+        return;
+      }
+  
+      this.chatService.searchHistory(this.searchQuery).subscribe(
+        (response) => {
+          this.searchResults = response.messages;
+        },
+        (error) => {
+          console.error('Error searching messages:', error);
+        }
+      );
+    }
+
+
     editMessage(messageId: number) {
       // Set the editingMessageId to the messageId to indicate which message is being edited
       this.editingMessageId = messageId;
@@ -66,6 +107,7 @@ export class ChatWithUserComponent implements OnInit{
       const editedMessage = this.conversationHistory.find(message => message.id === messageId);
       if (editedMessage) {
         this.editedMessageContent = editedMessage.content;
+        this.handleEditedMessage(this.editedMessageContent);
       }
     }
 
@@ -128,6 +170,7 @@ export class ChatWithUserComponent implements OnInit{
           (response) => {
             // Handle the success response, e.g., remove the deleted message from conversationHistory.
             console.log('Message deleted successfully:', response);
+            this.handleDeletedMessage(messageId);
             this.toastr.success("Message deleted successfully",'success');
             // Find the index of the deleted message in conversationHistory
             const deletedMessageIndex = this.conversationHistory.findIndex((message) => message.id === messageId);
