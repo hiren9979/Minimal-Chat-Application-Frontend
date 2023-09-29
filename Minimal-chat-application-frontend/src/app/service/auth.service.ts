@@ -41,13 +41,15 @@ export class AuthService {
     const user = localStorage.getItem('user');
     if (user) {
       const jsonObject = JSON.parse(user);
-      if(jsonObject.token===null) {
-        this.toastr.error("Authorization failed - Token null", 'error');
+      if (jsonObject && jsonObject.token !== null) {
+        return jsonObject.token;
+      } else {
+        this.toastr.error("Authorization failed - Token is null or undefined", 'error');
       }
-      return jsonObject.token;
     }
     return null;
   }
+  
   
 
 }

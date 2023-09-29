@@ -33,6 +33,13 @@ export class ChatComponent implements OnInit {
   receiverName : string = '';
   receiverId : string = '';
   time = new Date(); 
+  senderId : string = '';
+  sort = 'asc'; 
+  count = 20;
+
+  editingMessageId: number | null = null; // Store the ID of the message being edited
+  editedMessageContent = ''; // Store the edited message content
+
 
   constructor(
     private http: HttpClient,
@@ -48,23 +55,36 @@ export class ChatComponent implements OnInit {
   ngOnInit(): void {
     this.fetchUserList();
 
-    // this.chatMessages.nativeElement.addEventListener('scroll', () => {
-    //   this.onScroll();
-    // });
+    
 
     this.sendMessageForm = this.fb.group({
       messageText: ['', [Validators.required]],
     });
+
   }
 
   startChat(user: any) {
+    debugger
     // Set the selected user when a user is clicked
     this.selectedUser = user;
     this.wholeConversation = [];
     this.conversationHistory = [];
     console.log(this.selectedUser);
+
+    if (this.chatService.isConnectionDisconnected()) {
+      this.chatService.startConnection();
+    }
+    console.log(this.conversationHistory);
+    this.chatService.hubConnection.on('ReceiveMessage', (message:any) => {
+      this.conversationHistory.push(message);
+      this.wholeConversation = this.conversationHistory;
+  });
+   
     this.fetchConversationHistory();
   }
+
+
+   // Method to handle incoming edited messages from SignalR
 
   fetchUserList() {
     const token = this.authService.getToken(); // Get the JWT token from AuthService
@@ -91,9 +111,8 @@ export class ChatComponent implements OnInit {
 
 
   fetchConversationHistory(){
-    var senderId;
-    const sort = 'asc'; 
-    var count = 20;
+    debugger
+
     
     if (this.selectedUser) {
       // Check if a user is selected
@@ -101,46 +120,43 @@ export class ChatComponent implements OnInit {
       const user = localStorage.getItem('user');
       if (user) {
         const jsonObject = JSON.parse(user);
-        senderId = jsonObject.profile.id; 
+        this.senderId = jsonObject.profile.id; 
       }
-
-       // Get the JWT token from AuthService
-       const token = this.authService.getToken();
-
-       if (token) {
-         // Create headers with the Authorization header containing the JWT token
-         const headers = new HttpHeaders({
-           Authorization: `Bearer ${token}`,
-         });
          
        this.receiverId = this.selectedUser.id;
-      
+      this.getConversation();
+      }
 
-      // Use your chat service to fetch conversation history
-      this.chatService.getConversationHistory(senderId, this.receiverId, sort, this.time, count,headers).subscribe(
-        (response) => {
-          this.conversationHistory = response.messages.reverse();
-          console.log(this.conversationHistory);
-          
-         // Prepend conversationHistory to wholeConversation
-         this.wholeConversation.unshift(...this.conversationHistory);
-
-          this.time = new Date(response.messages[0].timestamp);
-          console.log(this.time);
-
-          console.log("fetched" , this.conversationHistory);
-          this.toastr.success('Conversation history retrieved!', 'Success');
-          
-          console.log('Conversation history:', response);
-          
-        },
-        (error) => {
-          console.log('Error fetching conversation history:', error);
-        }
-      );
-    }
+    
   }
-  }
+
+ private getConversation()
+ {
+    // Use your chat service to fetch conversation history
+    this.chatService.getConversationHistory(this.senderId, this.receiverId, this.sort, this.time, this.count).subscribe(
+      (response) => {
+        this.conversationHistory = response.messages.reverse();
+        console.log(this.conversationHistory);
+        
+       // Prepend conversationHistory to wholeConversation
+       this.wholeConversation.unshift(...this.conversationHistory);
+
+        this.time = new Date(response.messages[0].timestamp);
+        console.log("function time ", this.time);
+
+        console.log("fetched" , this.conversationHistory);
+
+        this.toastr.success('Conversation history retrieved!', 'Success');
+        
+        console.log('Conversation history:', response);
+        
+      },
+      (error) => {
+        console.log('Error fetching conversation history:', error);
+      }
+    );
+}
+ 
 
   // @HostListener('window:scroll', ['$event'])
   //   onScroll(event: Event) {
