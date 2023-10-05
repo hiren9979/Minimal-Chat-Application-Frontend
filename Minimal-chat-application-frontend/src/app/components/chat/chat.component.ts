@@ -37,8 +37,16 @@ export class ChatComponent implements OnInit {
   sort = 'asc'; 
   count = 20;
 
+  searchQuery: string = '';
+  // Define a property to store the search results
+  searchResults: any[] = [];
+
   editingMessageId: number | null = null; // Store the ID of the message being edited
   editedMessageContent = ''; // Store the edited message content
+
+  showUserList: boolean = true; // Variable to control whether to show user list or search results
+
+  loggedinUserId : string = '';
 
 
   constructor(
@@ -53,14 +61,24 @@ export class ChatComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
+    const user = localStorage.getItem('user');
+      if (user) {
+        const jsonObject = JSON.parse(user);
+        this.loggedinUserId = jsonObject.profile.id; 
+        console.log("LoggedInUserId : ",this.loggedinUserId);
+      }
+
     this.fetchUserList();
-
-    
-
     this.sendMessageForm = this.fb.group({
       messageText: ['', [Validators.required]],
     });
 
+  }
+
+   // Function to toggle between user list and search results
+   toggleUserList() {
+    this.showUserList = !this.showUserList;
   }
 
   startChat(user: any) {
@@ -109,6 +127,29 @@ export class ChatComponent implements OnInit {
     }
   }
 
+  searchMessages() {
+    if (this.searchQuery.trim() === '') {
+      this.searchResults = [];
+      return;
+    }
+
+    this.chatService.searchHistory(this.searchQuery,this.receiverId).subscribe(
+      (response) => {
+        this.searchResults = response.messages;
+        console.log("searchResults : ", this.searchResults);
+        this.toastr.success("Search query successfully executed!!!",'success');
+
+        this.showUserList = false; // Display search results when search is successful
+        
+      },
+      (error) => {
+        this.toastr.error("Search query failed!!!",'error');
+        console.error('Error searching messages:', error);
+      }
+    );
+  }
+
+
 
   fetchConversationHistory(){
     debugger
@@ -126,8 +167,6 @@ export class ChatComponent implements OnInit {
        this.receiverId = this.selectedUser.id;
       this.getConversation();
       }
-
-    
   }
 
  private getConversation()

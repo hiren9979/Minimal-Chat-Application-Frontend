@@ -175,3 +175,32 @@
   opacity: 1;
 }
 
+.search-bar{
+  display: flex;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.search-bar input {
+  flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    box-sizing: border-box;
+}
+
+.send-button{
+  justify-content: flex-end;
+  margin-right: 5px;
+  width: 90px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  height: 47px;
+  background-color: #007bff;
+}
+
+.search-container{
+  margin-bottom: 10px;
+}

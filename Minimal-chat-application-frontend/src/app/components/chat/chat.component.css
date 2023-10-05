@@ -23,12 +23,7 @@
     flex-direction: column;
   }
   
-  /* Style for chat messages, adjust as needed */
-  .chat-messages {
-    flex-grow: 1;
-    overflow-y: scroll; 
-  }
-  
+
   /* Style for the chat input field and send button */
   .chat-input {
     display: flex;
@@ -146,4 +141,129 @@
 }
 .send-button{
   justify-content: flex-end;
+}
+
+.search-bar{
+  display: flex;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.search-bar input {
+  flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    box-sizing: border-box;
+}
+
+.send-button{
+  justify-content: flex-end;
+  margin-right: 5px;
+  width: 90px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  height: 47px;
+  background-color: #007bff;
+}
+
+.search-container{
+  margin-bottom: 10px;
+}
+
+.chat-section {
+  flex: 1;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  overflow-y: auto;
+  max-height: calc(100% - 20px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.chat-section h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.search-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  border-bottom: 1px solid black; 
+}
+
+.close-button {
+  background-color: #f50101;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.close-button:hover {
+  background-color: #0056b3;
+}
+
+.chat-messages {
+  /* flex-grow: 1; */
+  border-radius: 10px;
+  color: white;
+  flex-grow: 1;
+  overflow-y: scroll;
+}
+
+/* Chat Messages Container */
+.chat-messages-container {
+  display: flex;
+  flex-direction: column; /* Make the container a column */
+  align-items: flex-start; /* Align items to the left */
+  justify-content: flex-start; /* Align content to the top */
+  padding-right: 15px !important;
+  justify-content: flex-end;
+  /* overflow-y: auto; */
+}
+
+
+/* Sender */
+.sender {
+  background-color: #25d366;
+  color: black;
+  border-radius: 10px;
+  padding: 5px 15px; 
+  display: inline-block;
+  margin-bottom: 5px ;
+  /* margin-left: 730px; */
+  margin-left: auto;
+}
+
+/* Receiver */
+.receiver { 
+  background-color: rgb(122, 204, 241);
+  color: #000;
+  border-radius: 10px;
+  padding: 5px 15px; /* Adjust padding as needed */
+  display: inline-block;
+  margin: 5px 0;
+  overflow-y: auto;
+}
+
+.message-timestamp{
+  font-weight: bold;
 }

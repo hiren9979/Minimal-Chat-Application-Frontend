@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/service/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { ChatService } from 'src/app/service/chat.service';
+import { ChatComponent } from '../chat/chat.component';
 
 
 
@@ -15,14 +16,12 @@ import { ChatService } from 'src/app/service/chat.service';
 export class ChatWithUserComponent implements OnInit{
     @Input() conversationHistory : any[] = [];
     @Input() receiverName : string = '';
+    @Input() receiverId : string = '';
     loggedinUserId : string = '';
     isOpenPopUp : boolean = false;
     searchText: string = '';
     originalMessages: any[] = this.conversationHistory;
 
-    searchQuery: string = '';
-    // Define a property to store the search results
-    searchResults: any[] = [];
    
     editingMessageId: number | null = null; // Track the message being edited
     editedMessageContent: string = ''; // Store the edited content
@@ -38,6 +37,7 @@ export class ChatWithUserComponent implements OnInit{
       private router: Router,
       private chatService : ChatService,
       private cdRef: ChangeDetectorRef,
+      private chatComponent : ChatComponent,
     ) {}
 
     ngOnInit(){
@@ -82,35 +82,23 @@ export class ChatWithUserComponent implements OnInit{
       }
     }
 
-    searchMessages() {
-      if (this.searchQuery.trim() === '') {
-        this.searchResults = [];
-        return;
-      }
-  
-      this.chatService.searchHistory(this.searchQuery).subscribe(
-        (response) => {
-          this.searchResults = response.messages;
-        },
-        (error) => {
-          console.error('Error searching messages:', error);
-        }
-      );
-    }
-
-
     editMessage(messageId: number) {
-      // Set the editingMessageId to the messageId to indicate which message is being edited
-      this.editingMessageId = messageId;
-      
-      // Find the message by messageId and set the editedMessageContent
-      const editedMessage = this.conversationHistory.find(message => message.id === messageId);
-      if (editedMessage) {
-        this.editedMessageContent = editedMessage.content;
-        this.handleEditedMessage(this.editedMessageContent);
-      }
+    debugger
+    // Check if editingMessageId is not null before proceeding
+    if (this.editingMessageId !== null) {
+        // Find the message by messageId and set the editedMessageContent
+        const editedMessage = this.conversationHistory.find(message => message.id === messageId);
+        if (editedMessage) {
+            this.editedMessageContent = editedMessage.content;
+            // Call editMessagesignal only if editingMessageId is not null
+            this.chatService.hubConnection.on('EditMessage', (messageId: number,content: string) => {
+              console.log("edit message log");
+              this.chatComponent.fetchConversationHistory();
+          });
+            this.handleEditedMessage(this.editedMessageContent);
+        }
     }
-
+}
     saveEditedMessage() {
 
        // Get the JWT token from AuthService
@@ -136,9 +124,13 @@ export class ChatWithUserComponent implements OnInit{
               this.conversationHistory[editedMessageIndex].content = this.editedMessageContent;
             }
             
+            if(this.editingMessageId!=null)
+              this.editMessage(this.editingMessageId);
+
             // Reset the editing state
             this.editingMessageId = null;
             this.editedMessageContent = '';
+          
           },
           (error) => {
             // Handle the error response, e.g., display an error message.
