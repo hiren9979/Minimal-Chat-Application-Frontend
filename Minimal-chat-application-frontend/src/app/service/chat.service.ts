@@ -114,6 +114,17 @@ export class ChatService {
         ':' + pad(tzo % 60);
 }
 
+
+editMessagesignal(messageId: number,content: string): void {
+  debugger
+  this.hubConnection.invoke('EditMessage',messageId, content)
+    .catch(err => console.error(err));
+}
+deleteMessagesignal(messageId: number): void {
+  this.hubConnection.invoke('DeleteMessage', messageId)
+    .catch(err => console.error(err));
+}
+
   // Create a method to send a message to a specific user
   sendMessageToUser(message: any,receiverId:string,headers:HttpHeaders): Observable<any> {
     const body = {
@@ -141,7 +152,7 @@ export class ChatService {
     return this.http.delete(`${this.apiUrl}/DeleteMessage/${messageId}`, { headers });
   }
 
-  searchHistory(query:any) : Observable<any>{
+  searchHistory(query:any,receiverId:string) : Observable<any>{
     let headers;
      // Get the JWT token from AuthService
      const token = this.authService.getToken();
@@ -152,7 +163,7 @@ export class ChatService {
     });
   }
 
-    return this.http.get(`${this.apiUrl}/SearchConversations?query=${query}`, { headers });
+    return this.http.get(`${this.apiUrl}/SearchConversations?query=${query}&receiverId=${receiverId}`, { headers });
   }
 
   // Add a method to handle edited messages received from the server
