@@ -67,7 +67,9 @@ export class LoginComponent {
           } else {
             console.log(x);
             
-            localStorage.setItem('user', x);
+            // Convert the user object to a JSON string before storing it
+            const userJson = JSON.stringify(x);
+            localStorage.setItem('user', userJson);
          
             // Assuming x contains the token
             this.toastr.success('Login successful!', 'Success');

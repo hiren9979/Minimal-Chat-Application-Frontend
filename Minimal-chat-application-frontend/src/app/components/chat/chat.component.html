@@ -25,6 +25,9 @@
           <h2>Search Results for "{{ searchQuery }}"</h2>
           <button class="close-button" (click)="showUserList = true">Close</button>
         </div>
+        <div class="chat-messages-container" *ngIf="!searchResults || searchResults.length === 0">
+          <p>No search results found.</p>
+        </div>
         <div class="chat-messages-container" *ngFor="let message of searchResults">
             <div
               [ngClass]="{
