@@ -18,31 +18,31 @@ export class RegisterComponent implements OnInit {
       private toastr : ToastrService,
     ){}
     ngOnInit(): void {
-        this.signupForm = this.fb.group({
-          firstName : ['', Validators.required],
-          lastName : ['', Validators.required],
-          email : ['', Validators.required,Validators.email],
-          password : ['', Validators.required,Validators.minLength(6)],
-        }) 
+      this.signupForm = this.fb.group({
+        firstName: ['', [Validators.required]],
+        lastName: ['', [Validators.required]],
+        email: ['', [Validators.required, Validators.email]], // Array of validators
+        password: ['', [Validators.required, Validators.minLength(6)]] // Array of validators
+      });
+      
     }
 
-    onSubmit(){
-      // if (this.signupForm.valid) 
-      {
-        const user = this.signupForm.value;
-    
-        this.authService.signup(user).subscribe(
-          (response) => {
-            console.log('Signup successful:', response);
-            this.toastr.success('SignUp successful!', 'Success');
-            this.router.navigate(['/login']);
-          },
-          (error) => {
-            this.toastr.error('Signup failed!', 'Error');
-            console.log('Signup failed:', error);
-          }
-        );
+    onSubmit() {
+      if (this.signupForm.valid) {
+          const user = this.signupForm.value;
+  
+          this.authService.signup(user).subscribe(
+              (response) => {
+                  console.log('Signup successful:', response);
+                  this.toastr.success('SignUp successful!', 'Success');
+                  this.router.navigate(['/login']);
+              },
+              (error) => {
+                  this.toastr.error('Signup failed!', 'Error');
+                  console.log('Signup failed:', error);
+              }
+          );
       }
-    }
+  }
 
 }
