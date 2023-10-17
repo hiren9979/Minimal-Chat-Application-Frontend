@@ -1,8 +1,23 @@
 <div class="chat-container">
   <ng-container >
   <div class="chat-section" *ngIf="showUserList; else searchResultsTemplate">
+    <button (click)="openCreateGroupPopup()">Create Group</button>
+
+
+    <h2>Group List</h2>
+    <ul class="user-list-items">
+      <li class="user-item" *ngFor="let group of groupList">
+        <div class="avatar-circle">
+          <p class="avatar-initial">{{ group.name.charAt(0) | titlecase  }}</p>
+        </div>
+        <div class="user-info">
+          <p class="user-name">{{ group.name | titlecase  }}</p>
+          <!-- Add other user details here if needed -->
+        </div>
+      </li>
+    </ul>
+
     <h2>User List</h2>
-   
     <ul class="user-list-items">
       <li class="user-item" *ngFor="let user of userList" (click)="startChat(user)">
         <div class="avatar-circle">
@@ -14,6 +29,30 @@
         </div>
       </li>
     </ul>
+
+     <!-- pop up open when click on create Gropu -->
+     <div class="create-group-popup" *ngIf="showCreateGroupPopup">
+      <h3>Create a Group</h3>
+      <form [formGroup]="createGroupForm" (ngSubmit)="createGroup()">
+        <div class="form-input">
+          <input type="text" placeholder="Group Name" formControlName="groupName">
+          <!-- Add more input fields and controls for the "Create Group" form if needed -->
+          <div *ngFor="let user of userList" class="user-checkbox">
+            <label>
+              <input type="checkbox" [checked]="selectedUserIds.includes(user.id)" (change)="toggleUserSelection(user.id)" >
+              {{ user.firstName }}
+            </label>
+          </div>
+          <!-- <select multiple formControlName="memberIds">
+            <option *ngFor="let user of userList" [value]="user.id">{{ user.firstName }}</option>
+          </select> -->
+        </div>
+        <div class="form-buttons">
+          <button type="submit">Create</button>
+          <button (click)="closeCreateGroupPopup()">Cancel</button>
+        </div>
+      </form>
+    </div>
    
   </div>
   </ng-container>

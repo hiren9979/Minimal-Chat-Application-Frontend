@@ -8,21 +8,11 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class LogService {
-  private apiUrl = 'https://localhost:7275/api/Log';
+  private apiUrl = 'https://localhost:7288/api/Log';
 
   constructor(
     private http: HttpClient,
     ) { }
-
-    // formatDateToCustomFormat(date: Date): string {
-    //   const isoString = date.toISOString();
-    //   const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-  
-    //   // Remove the 'Z' character from the ISO string and replace it with the milliseconds
-    //   const formattedDate = isoString.slice(0, -1) + milliseconds + 'Z';
-  
-    //   return formattedDate;
-    // }
 
     formatDateToCustomFormat(date: Date): string {
       const year = date.getFullYear();
@@ -78,6 +68,4 @@ export class LogService {
     
       return this.http.get(`${this.apiUrl}/GetLog`, options);
     }
-    
-
 }
