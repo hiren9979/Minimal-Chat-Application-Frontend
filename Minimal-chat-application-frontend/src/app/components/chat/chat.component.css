@@ -14,7 +14,7 @@
      /* Enable scrolling if the content overflows */
   }
   
-  .chat-with-user {
+  .chat-with-user,chat-with-group {
     flex: 3; /* Takes up 3/4 of the screen */
     padding: 20px;
     background-color: #fff;
@@ -315,3 +315,23 @@
 .create-group-popup button:hover {
   background-color: #0056b3;
 }
+
+.user-checkbox label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px; /* Add this to control the space below each checkbox and name */
+}
+
+.user-checkbox label input {
+  margin-left: -50px; /* Adjust this value to control the space between the checkbox and name */
+}
+
+.user-checkbox label span {
+  white-space: nowrap; /* Prevent name from wrapping to the next line */
+}
+
+.userName{
+  margin-left: -100px;
+  margin-bottom: 5px;
+}
+

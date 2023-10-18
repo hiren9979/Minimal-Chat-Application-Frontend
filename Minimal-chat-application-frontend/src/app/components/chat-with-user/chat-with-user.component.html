@@ -9,6 +9,9 @@
         <h2>{{ receiverName | titlecase }}</h2>
         <!-- Add any additional user information here, such as status, etc. -->
      </div>
+     <div class="group-edit-button" *ngIf="!isUserSelected">
+      <button (click)="openEditPopup()">Edit</button>
+    </div>
   </div>
   <!-- Chat Messages Container -->
   <div
@@ -69,4 +72,16 @@
      </div>
   </div>
 </div>
+
+<div class="edit-group-popup" *ngIf="isGroupNameEditPopupOpen">
+   <h3>Edit Group Name</h3>
+   <form [formGroup]="editGroupNameForm" (ngSubmit)="editGroupName()">
+     <div class="form-input">
+       <input type="text" placeholder="Group Name" formControlName="groupName" [(ngModel)]="groupName" [value]="receiverName">
+     </div>
+     <div class="form-buttons">
+       <button type="submit">Update</button>
+       <button (click)="closeGroupNameEditPopup()">Cancel</button>
+     </div>
+   </form>
 </div>

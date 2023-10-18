@@ -62,6 +62,11 @@ export class ChatComponent implements OnInit {
   groupName: string = '';
   groupList: any[] = []; // Property to store the list of created groups
 
+  selectedGroup: any = null;
+
+  isUserSelected: boolean = true;
+
+
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
@@ -98,13 +103,36 @@ export class ChatComponent implements OnInit {
     this.showUserList = !this.showUserList;
   }
 
-  startChat(user: any) {
+  startChat(userOrGroup: any) {
     debugger;
     // Set the selected user when a user is clicked
-    this.selectedUser = user;
+    this.selectedUser = userOrGroup;
+    if ('firstName' in userOrGroup)
+     {
+      this.receiverName = userOrGroup.firstName;
+      this.isUserSelected = true;
+    } 
+    else if ('name' in userOrGroup) 
+    {
+      this.receiverName = userOrGroup.name;
+      this.receiverId = userOrGroup.id;
+      this.isUserSelected = false;
+    }
+     else 
+     {
+      // Handle the case when the type of userOrGroup is unknown
+      console.error('Unknown type of userOrGroup:', userOrGroup);
+      return;
+    }
+    
+    console.log("selected user",this.selectedUser);
+    console.log("isUserSelected",this.isUserSelected);
+    
+    
+
     this.wholeConversation = [];
     this.conversationHistory = [];
-    console.log(this.selectedUser);
+    console.log("selected user",this.selectedUser);
 
     if (this.chatService.isConnectionDisconnected()) {
       this.chatService.startConnection();
@@ -116,6 +144,14 @@ export class ChatComponent implements OnInit {
     });
 
     this.fetchConversationHistory();
+  }
+
+  startGroupChat(group:any)
+  {
+    this.isUserSelected = false;
+    this.selectedUser = null;
+    this.selectedGroup = group;
+    this.groupName = group.name;
   }
 
   // Method to handle incoming edited messages from SignalR
@@ -192,8 +228,19 @@ export class ChatComponent implements OnInit {
     debugger;
 
     if (this.selectedUser) {
+      const userOrGroup = this.selectedUser;
+      if ('firstName' in userOrGroup)
+     {
+      this.receiverName = userOrGroup.firstName;
+      this.isUserSelected = true;
+    } 
+    else if ('name' in userOrGroup) 
+    {
+      this.receiverName = userOrGroup.name;
+      this.isUserSelected = false;
+    }
+
       // Check if a user is selected
-      this.receiverName = this.selectedUser.firstName;
       const user = localStorage.getItem('user');
       if (user) {
         const jsonObject = JSON.parse(user);

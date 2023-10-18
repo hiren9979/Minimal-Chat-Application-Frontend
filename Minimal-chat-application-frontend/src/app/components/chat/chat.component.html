@@ -6,13 +6,13 @@
 
     <h2>Group List</h2>
     <ul class="user-list-items">
-      <li class="user-item" *ngFor="let group of groupList">
+      <li class="user-item" *ngFor="let group of groupList" (click)="startChat(group)">
         <div class="avatar-circle">
-          <p class="avatar-initial">{{ group.name.charAt(0) | titlecase  }}</p>
+          <p class="avatar-initial">{{ group.name.charAt(0) | titlecase }}</p>
         </div>
         <div class="user-info">
-          <p class="user-name">{{ group.name | titlecase  }}</p>
-          <!-- Add other user details here if needed -->
+          <p class="user-name">{{ group.name | titlecase }}</p>
+          <!-- Add other group details here if needed -->
         </div>
       </li>
     </ul>
@@ -37,11 +37,13 @@
         <div class="form-input">
           <input type="text" placeholder="Group Name" formControlName="groupName">
           <!-- Add more input fields and controls for the "Create Group" form if needed -->
-          <div *ngFor="let user of userList" class="user-checkbox">
-            <label>
-              <input type="checkbox" [checked]="selectedUserIds.includes(user.id)" (change)="toggleUserSelection(user.id)" >
-              {{ user.firstName }}
-            </label>
+          <div class="checkbox-user">
+            <div *ngFor="let user of userList" class="user-checkbox">
+              <label>
+                <input type="checkbox" [checked]="selectedUserIds.includes(user.id)" (change)="toggleUserSelection(user.id)">
+                <div class="userName">{{ user.firstName }}</div>
+              </label>
+            </div>
           </div>
           <!-- <select multiple formControlName="memberIds">
             <option *ngFor="let user of userList" [value]="user.id">{{ user.firstName }}</option>
@@ -84,29 +86,32 @@
       </div>
     </ng-template>
 
-  <div class="chat-with-user">
-    <div class="search-container" *ngIf="selectedUser">
-      <div class="search-bar">
-         <input type="text" [(ngModel)]="searchQuery" placeholder="Search messages" />
-         <button class="send-button" type="button" style="align-self: flex-end;" (click)="searchMessages()">
-            <i class="bi bi-search"  style="font-size: 29px;width: 30px; color: white; font-weight: 700;"></i></button>
-       </div>
-      </div>
-    <div  class="chat-messages" #ConversationHistory [scrollTop]="0"
-    style="overflow-y: scroll;" (scroll)="onScroll($event)" >
-      <chat-with-user [conversationHistory]="wholeConversation"  [receiverName]="receiverName" [receiverId]="receiverId"></chat-with-user>
-    </div>
 
-    <div class="chat-input">
-      <form [formGroup]="sendMessageForm" (ngSubmit)="onSubmit()" style="display: flex;">
-        <input type="text" class="sendMessage-input" placeholder="Type your message..." name="message" formControlName="messageText" required style="flex: 1;" />
-        <button  class="send-button"  type="submit" style="align-self: flex-end;">Send</button>
-      </form>
+    <div class="chat-container">
+        <div class="chat-with-user">
+          <div class="search-container" *ngIf="selectedUser">
+            <div class="search-bar">
+               <input type="text" [(ngModel)]="searchQuery" placeholder="Search messages" />
+               <button class="send-button" type="button" style="align-self: flex-end;" (click)="searchMessages()">
+                  <i class="bi bi-search"  style="font-size: 29px;width: 30px; color: white; font-weight: 700;"></i></button>
+             </div>
+            </div>
+          <div  class="chat-messages" #ConversationHistory [scrollTop]="0"
+          style="overflow-y: scroll;" (scroll)="onScroll($event)" >
+            <chat-with-user [conversationHistory]="wholeConversation" [isUserSelected]="isUserSelected"  [receiverName]="receiverName" [receiverId]="receiverId"></chat-with-user>
+          </div>
+      
+          <div class="chat-input">
+            <form [formGroup]="sendMessageForm" (ngSubmit)="onSubmit()" style="display: flex;">
+              <input type="text" class="sendMessage-input" placeholder="Type your message..." name="message" formControlName="messageText" required style="flex: 1;" />
+              <button  class="send-button"  type="submit" style="align-self: flex-end;">Send</button>
+            </form>
+          </div>
+          <small *ngIf="sendMessageForm?.get('messageText')?.hasError('required') && sendMessageForm?.get('messageText')?.touched" style="color: red;">
+            *Message is required
+          </small>
+      
+        </div>
     </div>
-    <small *ngIf="sendMessageForm?.get('messageText')?.hasError('required') && sendMessageForm?.get('messageText')?.touched" style="color: red;">
-      *Message is required
-    </small>
-
-  </div>
   
 </div>  
