@@ -34,4 +34,29 @@ export class GroupService {
     const url = `${this.apiUrl}/groups`; // Replace with your actual endpoint
     return this.http.get(`${this.apiUrl}/GetAllGroups`, { headers });
   }
+
+  editGroupName(GroupId: string, UpdatedGroupName: string) {
+    let headers: HttpHeaders = new HttpHeaders();
+    
+    // Get the JWT token from AuthService
+    const token = this.authService.getToken();
+
+    if (token) {
+      headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
+    } else {
+      // Handle the case where there is no token (authentication issue)
+      // You may want to return an Observable or throw an error here.
+    }
+
+    const url = `${this.apiUrl}/editGroupName`;
+
+    const model = {
+      GroupId: GroupId,
+      UpdatedGroupName: UpdatedGroupName
+    };
+
+    return this.http.put(url, null, { params: model });
+  }
 }
