@@ -37,8 +37,13 @@ export class ChatWithUserComponent implements OnInit {
   editedMessageContent: string = ''; // Store the edited content
 
   isGroupNameEditPopupOpen = false;
+  isShowMemberPopupOpen = false;
   groupName: string = '';
   editedGroupName = '';
+
+  gropuAdminId = '';
+
+  groupMemberUsernames: { userName: string, userId: string }[] = [];
 
   @Input() isUserSelected: boolean = false;
 
@@ -260,7 +265,74 @@ export class ChatWithUserComponent implements OnInit {
     this.isGroupNameEditPopupOpen = false;
   }
 
+  openShowMemberPopup()
+  {
+     this.isShowMemberPopupOpen = true;
+     this.fetchGroupMembers();
+  }
+
+  fetchGroupMembers() {
+    const groupId = this.receiverId; // Replace with the actual group ID
+  
+    this.groupService.fetchGroupMembers(groupId).subscribe(
+      (response : any) => {
+        // Handle the retrieved group members, e.g., display them in your UI.
+        this.groupMemberUsernames = response;
+
+        console.log(this.groupMemberUsernames);
+        
+        const groupAdminMember = this.groupMemberUsernames.find((member : any) => member.isAdmin === true);
+
+        console.log("Group Admin : ", groupAdminMember);
+        
+
+      if (groupAdminMember) {
+        this.gropuAdminId = groupAdminMember.userId;
+        console.log('Group admin UserId:', this.gropuAdminId);
+      }
+
+        console.log('Group members:', this.groupMemberUsernames);
+      },
+      (error) => {
+        this.toastr.error('Error while fetching group members', 'error');
+        console.error('Error fetching group members:', error);
+      }
+    );
+  }
+  
+
+  closeShowMemberPopup()
+  {
+    this.isShowMemberPopupOpen = false;
+  }
   saveGroupName() {
     this.closeGroupNameEditPopup();
   }
+
+  removeGroupMember(userId: string) {
+   
+    const removeMembersDTO = {
+      MemberIds: [userId], 
+      AdminUserId:  this.gropuAdminId , 
+    };
+
+    const groupId = this.receiverId;
+   
+    this.groupService.removeGroupMembers(groupId, removeMembersDTO,).subscribe(
+      (response) => {
+        // Handle a successful response here
+        console.log('Group members removed:', response);
+        this.toastr.success('Group Member removed successfully !!!', 'success');
+        this.fetchGroupMembers();
+      },
+      (error) => {
+        // Handle errors here
+        console.error('Error removing group members:', error);
+        this.toastr.error('Error while removing group members', 'error');
+
+      }
+    );
+  }
+  
+
 }

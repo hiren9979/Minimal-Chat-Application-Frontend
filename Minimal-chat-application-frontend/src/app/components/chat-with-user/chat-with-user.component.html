@@ -11,6 +11,7 @@
      </div>
      <div class="group-edit-button" *ngIf="!isUserSelected">
       <button (click)="openEditPopup()">Edit</button>
+      <button (click)="openShowMemberPopup()"> showMember</button>
     </div>
   </div>
   <!-- Chat Messages Container -->
@@ -85,3 +86,15 @@
      </div>
    </form>
 </div>
+
+<div class="showMember-group-popup" *ngIf="isShowMemberPopupOpen">
+   <h3>Group Members</h3>
+   <button class="close-button" (click)="closeShowMemberPopup()"><i class="bi bi-x close-icon"></i></button>
+   <ul class="group-members-list">
+      <li *ngFor="let member of groupMemberUsernames" class="group-member-item" (click)="removeGroupMember(member.userId)">
+         {{ member.userName }}
+      </li>
+   </ul>
+</div>
+
+
