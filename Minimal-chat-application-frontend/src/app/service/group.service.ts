@@ -42,9 +42,6 @@ export class GroupService {
       headers = new HttpHeaders({
         Authorization: `Bearer ${token}`,
       });
-    } else {
-      // Handle the case where there is no token (authentication issue)
-      // You may want to return an Observable or throw an error here.
     }
 
     const url = `${this.apiUrl}/editGroupName`;
@@ -69,6 +66,36 @@ export class GroupService {
     .set('MemberIds', removeMembers.MemberIds.join(',')) // assuming MemberIds is an array
     .set('AdminUserId', removeMembers.AdminUserId);
     return this.http.delete(`${this.apiUrl}/${groupId}/remove-members`, { params:removeMembersDTO } );
+  }
+
+  makeUserAdmin(groupId: string, userId: string) {
+
+    let headers: HttpHeaders = new HttpHeaders();
+    // Get the JWT token from AuthService
+    const token = this.authService.getToken();
+
+    if (token) {
+      headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
+    }
+
+    // Make a POST request to your backend API to make the user an admin
+    return this.http.post(`${this.apiUrl}/${groupId}/makeUserAdmin?userId=${userId}`, {},{ headers } );
+  }
+
+  fetchUsersNotInGroupService(groupId : string){
+    let headers: HttpHeaders = new HttpHeaders();
+    // Get the JWT token from AuthService
+    const token = this.authService.getToken();
+
+    if (token) {
+      headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
+    }
+
+    return this.http.get(`${this.apiUrl}/${groupId}/GetUsersNotInGroup`,{headers:headers});
   }
 
 }

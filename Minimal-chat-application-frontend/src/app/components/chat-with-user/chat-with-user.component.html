@@ -12,7 +12,20 @@
      <div class="group-edit-button" *ngIf="!isUserSelected">
       <button (click)="openEditPopup()">Edit</button>
       <button (click)="openShowMemberPopup()"> showMember</button>
+      <button (click)="openAddGroupMemberPopup()">Add</button>
     </div>
+
+    <!-- <div class="three-dots-button" (click)="toggleDropdown()">
+      <i class="bi bi-three-dots"></i>
+    </div>
+
+    <div class="dropdown" >
+      <ul>
+        <li (click)="openEditPopup()">Edit</li>
+        <li (click)="openShowMemberPopup()">Delete</li>
+      </ul>
+    </div> -->
+
   </div>
   <!-- Chat Messages Container -->
   <div
@@ -91,10 +104,33 @@
    <h3>Group Members</h3>
    <button class="close-button" (click)="closeShowMemberPopup()"><i class="bi bi-x close-icon"></i></button>
    <ul class="group-members-list">
-      <li *ngFor="let member of groupMemberUsernames" class="group-member-item" (click)="removeGroupMember(member.userId)">
+      <li *ngFor="let member of groupMemberUsernames" class="group-member-item" (click)="openRemoveOrAdminPopup(member)">
          {{ member.userName }}
       </li>
    </ul>
 </div>
+
+<div class="addMember-group-popup" *ngIf="isAddGroupMemberPopupOpen">
+   <h4 class="class-notMember">User not in group</h4>
+   <button class="close-button" (click)="closeAddGroupMemberPopup()"><i class="bi bi-x close-icon"></i></button>
+   <ul class="group-members-list">
+      <li *ngFor="let user of userNotInGroup" class="group-member-item" (click)="addedGroupMember(user.userId)"
+      [class.selected-user]="isMemberAdded(user.userId)"
+      >
+         {{ user.userName }}
+      </li>
+   </ul>
+</div>
+
+<div class="remove-or-admin-popup" *ngIf="isRemoveOrAdminPopupOpen">
+   <div class="header-close">
+       <button class="close-button1" (click)="closeRemoveOrAdminPopup()"><i class="bi bi-x close-icon"></i></button>
+   </div>
+   <div class="action-buttons">
+       <button class="action-button btn btn-dark" (click)="removeGroupMember(selectedMember)">Remove Member</button>
+       <button class="action-button" (click)="makeUserAdmin()">Make Admin</button>
+   </div>
+</div>
+
 
 
