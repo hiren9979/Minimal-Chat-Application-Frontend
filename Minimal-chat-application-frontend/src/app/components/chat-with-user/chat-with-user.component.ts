@@ -43,9 +43,19 @@ export class ChatWithUserComponent implements OnInit {
 
   gropuAdminId = '';
 
-  groupMemberUsernames: { userName: string, userId: string }[] = [];
+  groupMemberUsernames: { userName: string; userId: string }[] = [];
+
+  isRemoveOrAdminPopupOpen: boolean = false;
+
+  selectedMember: any;
 
   @Input() isUserSelected: boolean = false;
+  isDropdownOpen: boolean = false;
+
+  isAddGroupMemberPopupOpen : boolean = false;
+  userNotInGroup!: any[];
+  wantToAddMembers: string[] = [];
+
 
   @ViewChild('forScrolling') forScrolling!: ElementRef;
 
@@ -243,8 +253,7 @@ export class ChatWithUserComponent implements OnInit {
     if (this.editGroupNameForm.valid) {
       const updatedGroupName = this.editGroupNameForm.value.groupName;
       const groupId = this.receiverId; // Replace with the actual group ID
-      console.log("Group Id : ", groupId);
-      
+      console.log('Group Id : ', groupId);
 
       this.groupService.editGroupName(groupId, updatedGroupName).subscribe(
         (response) => {
@@ -265,31 +274,31 @@ export class ChatWithUserComponent implements OnInit {
     this.isGroupNameEditPopupOpen = false;
   }
 
-  openShowMemberPopup()
-  {
-     this.isShowMemberPopupOpen = true;
-     this.fetchGroupMembers();
+  openShowMemberPopup() {
+    this.isShowMemberPopupOpen = true;
+    this.fetchGroupMembers();
   }
 
   fetchGroupMembers() {
     const groupId = this.receiverId; // Replace with the actual group ID
-  
+
     this.groupService.fetchGroupMembers(groupId).subscribe(
-      (response : any) => {
+      (response: any) => {
         // Handle the retrieved group members, e.g., display them in your UI.
         this.groupMemberUsernames = response;
 
         console.log(this.groupMemberUsernames);
-        
-        const groupAdminMember = this.groupMemberUsernames.find((member : any) => member.isAdmin === true);
 
-        console.log("Group Admin : ", groupAdminMember);
-        
+        const groupAdminMember = this.groupMemberUsernames.find(
+          (member: any) => member.isAdmin === true
+        );
 
-      if (groupAdminMember) {
-        this.gropuAdminId = groupAdminMember.userId;
-        console.log('Group admin UserId:', this.gropuAdminId);
-      }
+        console.log('Group Admin : ', groupAdminMember);
+
+        if (groupAdminMember) {
+          this.gropuAdminId = groupAdminMember.userId;
+          console.log('Group admin UserId:', this.gropuAdminId);
+        }
 
         console.log('Group members:', this.groupMemberUsernames);
       },
@@ -299,40 +308,121 @@ export class ChatWithUserComponent implements OnInit {
       }
     );
   }
-  
 
-  closeShowMemberPopup()
-  {
+  closeShowMemberPopup() {
     this.isShowMemberPopupOpen = false;
   }
+
   saveGroupName() {
     this.closeGroupNameEditPopup();
   }
 
-  removeGroupMember(userId: string) {
-   
+  removeGroupMember(member: any) {
     const removeMembersDTO = {
-      MemberIds: [userId], 
-      AdminUserId:  this.gropuAdminId , 
+      MemberIds: [member.userId],
+      AdminUserId: this.gropuAdminId,
     };
 
     const groupId = this.receiverId;
-   
-    this.groupService.removeGroupMembers(groupId, removeMembersDTO,).subscribe(
+
+    this.groupService.removeGroupMembers(groupId, removeMembersDTO).subscribe(
       (response) => {
         // Handle a successful response here
         console.log('Group members removed:', response);
-        this.toastr.success('Group Member removed successfully !!!', 'success');
+
+        this.toastr.success(`${this.selectedMember.userName} is remove from ${this.receiverName} group`, 'success');
+        this.closeRemoveOrAdminPopup();
         this.fetchGroupMembers();
       },
       (error) => {
         // Handle errors here
         console.error('Error removing group members:', error);
         this.toastr.error('Error while removing group members', 'error');
-
       }
     );
   }
+
+  openRemoveOrAdminPopup(member: any) {
+    this.isRemoveOrAdminPopupOpen = true; 
+    this.selectedMember = member;
+  }
+
+  closeRemoveOrAdminPopup() {
+    this.isRemoveOrAdminPopupOpen = false;
+  }
+
+  makeUserAdmin() {
+    console.log("groupId : ", this.receiverId);
+    console.log("userId : ", this.selectedMember.userId);
+    
+    
+    // Call the service method to make the selected member an admin
+    this.groupService.makeUserAdmin(this.receiverId, this.selectedMember.userId).subscribe(
+      (response) => {
+        console.log('User made admin successfully',this.selectedMember);
+        console.log(this.receiverName);
+
+        this.toastr.success(`${this.selectedMember.userName} is now admin of ${this.receiverName} group`, 'success');
+        this.closeRemoveOrAdminPopup();
+      },
+      (error) => {
+        console.error('Failed to make the user admin', error);
+
+        if (error.status === 500 || error.error.error === "You are not authorized to make this user an admin") {
+          // Handle the specific case where the user is not authorized to make the user an admin
+          this.toastr.error('You are not authorized to make this user an admin', 'error');
+        } else {  
+          // Handle other error cases
+          this.toastr.error('Error while making group member admin', 'error');
+        }
+      }
+    );
+  }
+
+toggleDropdown() {
+  this.isDropdownOpen = true;
+}
+
+fetchUsersNotInGroup()
+{
+
+  console.log("receiver id " , this.receiverId);
   
+  this.groupService.fetchUsersNotInGroupService(this.receiverId).subscribe(
+    (response) => {  
+      this.userNotInGroup = response as any[];
+      console.log('Users not in the group:', this.userNotInGroup);
+    },
+    (error) => {
+      console.error('Error fetching users not in the group:', error);
+    }
+  );
+}
+
+openAddGroupMemberPopup(){
+  this.isAddGroupMemberPopupOpen = true;
+  this.fetchUsersNotInGroup();
+}
+
+closeAddGroupMemberPopup(){
+  this.isAddGroupMemberPopupOpen = false;
+}
+
+addedGroupMember(userId:string){
+  const index = this.wantToAddMembers.indexOf(userId);
+  if (index !== -1) {
+    // User is already added, remove them
+    this.wantToAddMembers.splice(index, 1);
+  } else {
+    // User is not added, add them
+    this.wantToAddMembers.push(userId);
+  }
+  console.log(this.wantToAddMembers);
+  
+}
+  
+isMemberAdded(userId: string): boolean {
+  return this.wantToAddMembers.includes(userId);
+}
 
 }
