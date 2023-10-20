@@ -405,6 +405,10 @@ openAddGroupMemberPopup(){
 }
 
 closeAddGroupMemberPopup(){
+
+  this.userNotInGroup.forEach(user => {
+    user.isMemberAdded = false;
+  });
   this.isAddGroupMemberPopupOpen = false;
 }
 
@@ -423,6 +427,26 @@ addedGroupMember(userId:string){
   
 isMemberAdded(userId: string): boolean {
   return this.wantToAddMembers.includes(userId);
+}
+
+AddMembersInGroup()
+{
+  this.groupService.addGroupMembers(this.receiverId, this.wantToAddMembers).subscribe(
+    (response) => {
+      // Handle the success response here
+      console.log('Members added successfully:', response);
+      this.toastr.success(`Members added successfully in ${this.receiverName}`, 'Success');
+      this.closeAddGroupMemberPopup();
+      // Clear the selected members from wantToAddMembers
+      this.wantToAddMembers = [];
+    },
+    (error) => {
+      this.toastr.error('Error while adding members','error');
+      // Handle errors here
+      console.error('Error adding members to the group:', error);
+    }
+  );
+
 }
 
 }

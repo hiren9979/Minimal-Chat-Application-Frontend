@@ -413,3 +413,14 @@
   background-color: blue; /* Change the color to your preferred color */
   color: white;
 }
+
+.add-button{
+  background-color: #ffff56;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.add-button:hover {
+  background-color: #75ade9;
+}
