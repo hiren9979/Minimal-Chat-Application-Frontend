@@ -98,4 +98,26 @@ export class GroupService {
     return this.http.get(`${this.apiUrl}/${groupId}/GetUsersNotInGroup`,{headers:headers});
   }
 
+  addGroupMembers(groupId: string, memberIds: string[]) {
+    // Get the JWT token from AuthService
+    const token = this.authService.getToken();
+
+    let headers;
+    if (token) {
+      // Create headers with the Authorization header containing the JWT token
+       headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
+    }
+      // Create the request body with group ID and member IDs
+      const body = {
+        groupId: groupId,
+        memberIds: memberIds
+      };
+
+      const options = { headers: headers };
+
+      return this.http.post(`${this.apiUrl}/AddGroupMembers`, body , options);
+  }
+
 }
