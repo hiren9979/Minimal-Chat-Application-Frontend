@@ -16,6 +16,9 @@ import { ChatService } from 'src/app/service/chat.service';
 import { ChatComponent } from '../chat/chat.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GroupService } from 'src/app/service/group.service';
+import { Location } from '@angular/common';
+import { RealTimeMessageService } from 'src/app/service/real-time-message.service';
+
 
 @Component({
   selector: 'chat-with-user',
@@ -68,7 +71,9 @@ export class ChatWithUserComponent implements OnInit {
     private fb: FormBuilder,
     private chatService: ChatService,
     private cdRef: ChangeDetectorRef,
-    private chatComponent: ChatComponent
+    private chatComponent: ChatComponent,
+    private location : Location,
+    private sharedChatService : RealTimeMessageService,
   ) {}
 
   ngOnInit() {
@@ -83,6 +88,26 @@ export class ChatWithUserComponent implements OnInit {
 
     this.editGroupNameForm = this.fb.group({
       groupName: ['', Validators.required], // You can add more validators if needed
+    });
+
+    console.log(this.conversationHistory);
+
+    this.chatService.receiveMessageSignalR().subscribe((message: any) => {
+      debugger   
+      // this.conversationHistory.push(message);
+      console.log(this.conversationHistory);
+      console.log("New message", message)
+
+      this.sharedChatService.getConversationHistory();
+
+      this.sharedChatService.getConversationHistoryObservable().subscribe((history: any[]) => {
+        // Handle updates to the conversation history in real-time
+        this.conversationHistory = history;
+      });
+
+      console.log("updated : ",this.conversationHistory);
+      
+      
     });
   }
 
@@ -180,6 +205,7 @@ export class ChatWithUserComponent implements OnInit {
               // Reset the editing state
               this.editingMessageId = null;
               this.editedMessageContent = '';
+              this.closeEditPopup();
             },
             (error) => {
               // Handle the error response, e.g., display an error message.
@@ -194,6 +220,7 @@ export class ChatWithUserComponent implements OnInit {
     // Reset the editing state when the user cancels editing
     this.editingMessageId = null;
     this.editedMessageContent = '';
+    this.closeEditPopup();
   }
 
   deleteMessage(messageId: number) {
@@ -249,6 +276,11 @@ export class ChatWithUserComponent implements OnInit {
     console.log(this.isGroupNameEditPopupOpen);
   }
 
+  closeEditPopup()
+  {
+    this.isGroupNameEditPopupOpen = false;
+  }
+
   editGroupName() {
     if (this.editGroupNameForm.valid) {
       const updatedGroupName = this.editGroupNameForm.value.groupName;
@@ -259,8 +291,11 @@ export class ChatWithUserComponent implements OnInit {
         (response) => {
           console.log('Group name updated successfully', response);
           this.toastr.success('GroupName Updated successfully', 'success');
+
           this.closeGroupNameEditPopup();
-          this.chatComponent.fetchGroupList();
+
+          window.location.reload();
+          // this.chatComponent.fetchGroupList();
         },
         (error) => {
           this.toastr.error('Error while updating group name', 'error');
@@ -301,6 +336,7 @@ export class ChatWithUserComponent implements OnInit {
         }
 
         console.log('Group members:', this.groupMemberUsernames);
+        return this.groupMemberUsernames;
       },
       (error) => {
         this.toastr.error('Error while fetching group members', 'error');
@@ -381,6 +417,8 @@ export class ChatWithUserComponent implements OnInit {
 
 toggleDropdown() {
   this.isDropdownOpen = true;
+  console.log(this.isDropdownOpen);
+  
 }
 
 fetchUsersNotInGroup()

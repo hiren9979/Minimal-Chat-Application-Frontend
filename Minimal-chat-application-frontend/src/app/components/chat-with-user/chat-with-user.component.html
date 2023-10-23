@@ -10,21 +10,15 @@
         <!-- Add any additional user information here, such as status, etc. -->
      </div>
      <div class="group-edit-button" *ngIf="!isUserSelected">
-      <button (click)="openEditPopup()">Edit</button>
-      <button (click)="openShowMemberPopup()"> showMember</button>
-      <button (click)="openAddGroupMemberPopup()">Add</button>
-    </div>
+      <i class="bi bi-three-dots-vertical " (click)="toggleDropdown()"></i>
 
-    <!-- <div class="three-dots-button" (click)="toggleDropdown()">
-      <i class="bi bi-three-dots"></i>
+      <div class="dropdown-menu" *ngIf="isDropdownOpen">
+         <!-- Add your dropdown menu content here -->
+         <button class="operation-btn"  (click)="openEditPopup()">Edit</button>
+         <button class="operation-btn" (click)="openShowMemberPopup()">Show Members</button>
+         <button class="operation-btn" (click)="openAddGroupMemberPopup()">Add</button>
+      </div>
     </div>
-
-    <div class="dropdown" >
-      <ul>
-        <li (click)="openEditPopup()">Edit</li>
-        <li (click)="openShowMemberPopup()">Delete</li>
-      </ul>
-    </div> -->
 
   </div>
   <!-- Chat Messages Container -->
@@ -63,7 +57,7 @@
         aria-labelledby="myModalLabel"
         aria-hidden="true"
         >
-        <div *ngIf="editingMessageId === message.id" class="editing-dialog">
+        <div *ngIf="editingMessageId === message.id " class="editing-dialog">
           <input type="text" [(ngModel)]="editedMessageContent" class="edit-input" aria-label="Default" />
           <div class="button-container">
               <button

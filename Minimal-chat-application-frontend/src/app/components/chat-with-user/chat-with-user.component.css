@@ -424,3 +424,43 @@
 .add-button:hover {
   background-color: #75ade9;
 }
+
+.bi.bi-three-dots-vertical {
+  color: black;
+}
+
+.group-edit-button {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+.group-edit-button:hover .dropdown-menu {
+  display: block;
+}
+
+.operation-btn {
+  list-style-type: none;
+  padding: 10px;
+  width: 100%;
+  border: 0;
+  border-bottom: 3px solid #ccc;
+  background-color: #f5f5f5;
+  margin-bottom: -8px;
+  margin-top: -8px;
+  font-size: 16px;
+  color: #333;
+}
+
+.operation-btn:hover{
+  background-color: rgb(230, 233, 63);
+}

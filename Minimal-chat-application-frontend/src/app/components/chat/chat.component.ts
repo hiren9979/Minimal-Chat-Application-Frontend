@@ -65,7 +65,7 @@ export class ChatComponent implements OnInit {
   selectedGroup: any = null;
 
   isUserSelected: boolean = true;
-
+  isGroup: boolean = false;
 
   constructor(
     private http: HttpClient,
@@ -83,7 +83,6 @@ export class ChatComponent implements OnInit {
     if (user) {
       const jsonObject = JSON.parse(user);
       this.loggedinUserId = jsonObject.profile.id;
-      console.log('LoggedInUserId : ', this.loggedinUserId);
     }
 
     this.fetchUserList();
@@ -91,7 +90,7 @@ export class ChatComponent implements OnInit {
       messageText: ['', [Validators.required]],
     });
 
-    this.fetchGroupList(); 
+    this.fetchGroupList();
     this.createGroupForm = this.fb.group({
       groupName: ['', Validators.required],
       // memberIds: this.fb.array([]), // Initialize as an empty array
@@ -104,40 +103,29 @@ export class ChatComponent implements OnInit {
   }
 
   startChat(userOrGroup: any) {
-    debugger;
     // Set the selected user when a user is clicked
     this.selectedUser = userOrGroup;
-    if ('firstName' in userOrGroup)
-     {
+    if ('firstName' in userOrGroup) {
       this.receiverName = userOrGroup.firstName;
       this.isUserSelected = true;
-    } 
-    else if ('name' in userOrGroup) 
-    {
+      this.isGroup = false;
+    } else if ('name' in userOrGroup) {
+      this.isGroup = true;
       this.receiverName = userOrGroup.name;
       this.receiverId = userOrGroup.id;
       this.isUserSelected = false;
-    }
-     else 
-     {
+    } else {
       // Handle the case when the type of userOrGroup is unknown
       console.error('Unknown type of userOrGroup:', userOrGroup);
       return;
     }
-    
-    console.log("selected user",this.selectedUser);
-    console.log("isUserSelected",this.isUserSelected);
-    
-    
 
     this.wholeConversation = [];
     this.conversationHistory = [];
-    console.log("selected user",this.selectedUser);
 
     if (this.chatService.isConnectionDisconnected()) {
-      this.chatService.startConnection();
+      this.chatService.startSignalRConnection();
     }
-    console.log(this.conversationHistory);
     this.chatService.hubConnection.on('ReceiveMessage', (message: any) => {
       this.conversationHistory.push(message);
       this.wholeConversation = this.conversationHistory;
@@ -146,8 +134,7 @@ export class ChatComponent implements OnInit {
     this.fetchConversationHistory();
   }
 
-  startGroupChat(group:any)
-  {
+  startGroupChat(group: any) {
     this.isUserSelected = false;
     this.selectedUser = null;
     this.selectedGroup = group;
@@ -165,14 +152,11 @@ export class ChatComponent implements OnInit {
 
       this.authService.getUserList(headers).subscribe(
         (response) => {
-          console.log('User list fetch successful:', response);
           this.toastr.success('User list fetch successful!', 'Success');
           this.userList = response.users;
-          console.log(this.userList);
         },
         (error) => {
           this.toastr.error('User list fetch failed!', 'Error');
-          console.log('User list fetch failed:', error);
         }
       );
     }
@@ -189,15 +173,12 @@ export class ChatComponent implements OnInit {
 
       // Replace 'groupList' and 'getGroupList' with your actual API endpoint for fetching group list
       this.groupService.getGroupList(headers).subscribe(
-        (response : any) => {
-          console.log('Group list fetch successful:', response);
+        (response: any) => {
           this.toastr.success('Group list fetch successful!', 'Success');
           this.groupList = response;
-          console.log(this.groupList);
         },
         (error) => {
           this.toastr.error('Group list fetch failed!', 'Error');
-          console.log('Group list fetch failed:', error);
         }
       );
     }
@@ -212,7 +193,6 @@ export class ChatComponent implements OnInit {
     this.chatService.searchHistory(this.searchQuery, this.receiverId).subscribe(
       (response) => {
         this.searchResults = response.messages;
-        console.log('searchResults : ', this.searchResults);
         this.toastr.success('Search query successfully executed!!!', 'success');
 
         this.showUserList = false; // Display search results when search is successful
@@ -225,20 +205,15 @@ export class ChatComponent implements OnInit {
   }
 
   fetchConversationHistory() {
-    debugger;
-
     if (this.selectedUser) {
       const userOrGroup = this.selectedUser;
-      if ('firstName' in userOrGroup)
-     {
-      this.receiverName = userOrGroup.firstName;
-      this.isUserSelected = true;
-    } 
-    else if ('name' in userOrGroup) 
-    {
-      this.receiverName = userOrGroup.name;
-      this.isUserSelected = false;
-    }
+      if ('firstName' in userOrGroup) {
+        this.receiverName = userOrGroup.firstName;
+        this.isUserSelected = true;
+      } else if ('name' in userOrGroup) {
+        this.receiverName = userOrGroup.name;
+        this.isUserSelected = false;
+      }
 
       // Check if a user is selected
       const user = localStorage.getItem('user');
@@ -249,6 +224,7 @@ export class ChatComponent implements OnInit {
 
       this.receiverId = this.selectedUser.id;
       this.getConversation();
+      
     }
   }
 
@@ -260,24 +236,24 @@ export class ChatComponent implements OnInit {
         this.receiverId,
         this.sort,
         this.time,
-        this.count
+        this.count,
+        this.isGroup
       )
       .subscribe(
         (response) => {
           this.conversationHistory = response.messages.reverse();
-          console.log(this.conversationHistory);
 
           // Prepend conversationHistory to wholeConversation
           this.wholeConversation.unshift(...this.conversationHistory);
+          // this.time = new Date(response.messages[0].timestamp);
+          this.time =
+            this.conversationHistory.length > 0
+              ? new Date(this.conversationHistory[0].timestamp)
+              : new Date();
 
-          this.time = new Date(response.messages[0].timestamp);
-          console.log('function time ', this.time);
-
-          console.log('fetched', this.conversationHistory);
+        // this.chatService.sendMessageSignalR(newMessage);
 
           this.toastr.success('Conversation history retrieved!', 'Success');
-
-          console.log('Conversation history:', response);
         },
         (error) => {
           console.log('Error fetching conversation history:', error);
@@ -295,8 +271,6 @@ export class ChatComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.sendMessageForm.value);
-    console.log(this.receiverId);
     if (this.sendMessageForm.valid) {
       const msg = this.sendMessageForm.value;
 
@@ -310,22 +284,55 @@ export class ChatComponent implements OnInit {
           'Content-Type': 'application/json',
         });
 
-        this.chatService
-          .sendMessageToUser(msg, this.receiverId, headers)
-          .subscribe(
+        if (!this.isGroup) {
+          this.chatService
+            .sendMessageToUser(msg, this.receiverId, headers)
+            .subscribe(
+              (response) => {
+                this.chatService.sendMessageSignalR(msg);
+                this.toastr.success('Message sent successful!', 'Success');
+                this.time = new Date();
+                this.wholeConversation = [];
+                this.fetchConversationHistory();
+                this.wholeConversation.push(response);
+                this.sendMessageForm.reset();
+              },
+              (error) => {
+                this.toastr.error('Message Sent failed!', 'Error');
+              }
+            );
+        } 
+        else 
+        {
+          this.groupService.sendMessageToGroupMembers(this.receiverId, msg).subscribe(
             (response) => {
-              console.log('Message Sent successful:', response);
-              this.toastr.success('Message sent successful!', 'Success');
+              this.toastr.success('Message Sent successfully!', 'Success');
+      
               this.time = new Date();
               this.wholeConversation = [];
               this.fetchConversationHistory();
+      
+              console.log(
+                'conversation history after call fch',
+                this.conversationHistory
+              );
+
+              this.wholeConversation = this.conversationHistory;
+              this.wholeConversation.push(response.newMessage);
+              console.log("newMesage",response.newMessage);
+              
+              console.log('wholeconversation', this.wholeConversation);
+
+
+              this.chatService.sendMessageSignalR(response.newMessage);
+      
               this.sendMessageForm.reset();
             },
             (error) => {
               this.toastr.error('Message Sent failed!', 'Error');
-              console.log('Message Sent failed:', error);
             }
           );
+        }
       }
     }
   }
@@ -353,44 +360,42 @@ export class ChatComponent implements OnInit {
   createGroup() {
     // Validate the group name and selected users before creating a group
     const formData = this.createGroupForm.value;
-  
+
     // Access groupName from the form
     const groupNameControl = this.createGroupForm.get('groupName');
     if (groupNameControl) {
       const groupName = groupNameControl.value;
-  
-      // Log the values for debugging
-      console.log('groupName:', groupName);
-      console.log('loggedinUserId:', this.loggedinUserId);
-      console.log('selectedUserIds:', this.selectedUserIds);
-  
-      // Send formData to your API
-      console.log(formData);
-  
+
       if (this.createGroupForm.valid) {
         // Check if this.groupName is not null or empty
         if (!groupName) {
           this.toastr.error('Group name is required.', 'Error');
           return;
         }
-  
+
         if (this.selectedUserIds.length === 0) {
-          this.toastr.error('At least one user must be selected for the group.', 'Error');
+          this.toastr.error(
+            'At least one user must be selected for the group.',
+            'Error'
+          );
           return;
         }
-  
+
         // Prepare the data for creating the group
         const groupData = {
           Name: groupName,
           CreatorUserId: this.loggedinUserId,
           SelectedUserIds: this.selectedUserIds,
         };
-  
+
         // Make an API call to create the group
         this.groupService.createGroup(groupData).subscribe(
           (response) => {
             // Handle the API response, e.g., show a success message.
-            this.toastr.success(`${response.name} Group created successfully!`, 'Success');
+            this.toastr.success(
+              `${response.name} Group created successfully!`,
+              'Success'
+            );
             this.fetchGroupList();
             // Close the "Create Group" popup
             this.closeCreateGroupPopup();
@@ -399,8 +404,6 @@ export class ChatComponent implements OnInit {
             this.selectedUserIds = [];
           },
           (error) => {
-            console.log('API error:', error);
-  
             // Handle errors, e.g., display an error message.
             this.toastr.error('Error while creating the group.', 'Error');
           }
@@ -408,5 +411,4 @@ export class ChatComponent implements OnInit {
       }
     }
   }
-  
 }

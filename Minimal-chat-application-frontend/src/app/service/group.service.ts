@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
+import { SendMessageToGroupMembersRequest } from '../service/IsendMessage';
+import { group } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root',
@@ -61,15 +63,16 @@ export class GroupService {
     return this.http.get<any[]>(url, { headers, params: { groupId } });
   }
 
-  removeGroupMembers(groupId: string,removeMembers : any) {
+  removeGroupMembers(groupId: string, removeMembers: any) {
     const removeMembersDTO = new HttpParams()
-    .set('MemberIds', removeMembers.MemberIds.join(',')) // assuming MemberIds is an array
-    .set('AdminUserId', removeMembers.AdminUserId);
-    return this.http.delete(`${this.apiUrl}/${groupId}/remove-members`, { params:removeMembersDTO } );
+      .set('MemberIds', removeMembers.MemberIds.join(',')) // assuming MemberIds is an array
+      .set('AdminUserId', removeMembers.AdminUserId);
+    return this.http.delete(`${this.apiUrl}/${groupId}/remove-members`, {
+      params: removeMembersDTO,
+    });
   }
 
   makeUserAdmin(groupId: string, userId: string) {
-
     let headers: HttpHeaders = new HttpHeaders();
     // Get the JWT token from AuthService
     const token = this.authService.getToken();
@@ -81,10 +84,14 @@ export class GroupService {
     }
 
     // Make a POST request to your backend API to make the user an admin
-    return this.http.post(`${this.apiUrl}/${groupId}/makeUserAdmin?userId=${userId}`, {},{ headers } );
+    return this.http.post(
+      `${this.apiUrl}/${groupId}/makeUserAdmin?userId=${userId}`,
+      {},
+      { headers }
+    );
   }
 
-  fetchUsersNotInGroupService(groupId : string){
+  fetchUsersNotInGroupService(groupId: string) {
     let headers: HttpHeaders = new HttpHeaders();
     // Get the JWT token from AuthService
     const token = this.authService.getToken();
@@ -95,7 +102,9 @@ export class GroupService {
       });
     }
 
-    return this.http.get(`${this.apiUrl}/${groupId}/GetUsersNotInGroup`,{headers:headers});
+    return this.http.get(`${this.apiUrl}/${groupId}/GetUsersNotInGroup`, {
+      headers: headers,
+    });
   }
 
   addGroupMembers(groupId: string, memberIds: string[]) {
@@ -105,19 +114,43 @@ export class GroupService {
     let headers;
     if (token) {
       // Create headers with the Authorization header containing the JWT token
-       headers = new HttpHeaders({
+      headers = new HttpHeaders({
         Authorization: `Bearer ${token}`,
       });
     }
-      // Create the request body with group ID and member IDs
-      const body = {
-        groupId: groupId,
-        memberIds: memberIds
-      };
+    // Create the request body with group ID and member IDs
+    const body = {
+      groupId: groupId,
+      memberIds: memberIds,
+    };
 
-      const options = { headers: headers };
+    const options = { headers: headers };
 
-      return this.http.post(`${this.apiUrl}/AddGroupMembers`, body , options);
+    return this.http.post(`${this.apiUrl}/AddGroupMembers`, body, options);
   }
 
+  sendMessageToGroupMembers(
+    groupId: string,
+    messageText: any
+  ): Observable<any> {
+    const token = this.authService.getToken();
+
+    let headers;
+    if (token) {
+      // Create headers with the Authorization header containing the JWT token
+      headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
+    }
+
+    console.log(typeof messageText);
+
+    const options = { headers: headers };
+
+    return this.http.post(  
+      `${this.apiUrl}/SendMessageToGroupMembers?groupId=${groupId}&messageText=${messageText.messageText}`,
+      null,
+      options
+    );
+  }
 }
