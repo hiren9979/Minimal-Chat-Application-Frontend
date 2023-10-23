@@ -5,6 +5,7 @@ import { Token } from '@angular/compiler';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from './auth.service';
 import * as signalR from '@microsoft/signalr';
+import { RealTimeMessageService } from './real-time-message.service';
 
 
 
@@ -17,7 +18,8 @@ export class ChatService {
 
   constructor(
     private http: HttpClient,
-    private authService : AuthService
+    private authService : AuthService,
+    private sharedChatService: RealTimeMessageService
     ) {
       if (
         !this.hubConnection ||
@@ -37,7 +39,7 @@ export class ChatService {
   }
 
 
-     private startSignalRConnection(): void {
+     public startSignalRConnection(): void {
       this.hubConnection
         .start()
         .then(() => {
@@ -48,17 +50,6 @@ export class ChatService {
         });
     }
   
-    startConnection(): void {
-      this.hubConnection
-        .start()
-        .then(() => {
-          console.log('Connection started');
-        })
-        .catch((err) => {
-          console.error('Error while starting connection: ' + err);
-        });
-    }
-
     /**
    * Retrieves a JSON Web Token (JWT) from local storage.
    *
@@ -74,6 +65,7 @@ export class ChatService {
     sort: string,
     time: Date,
     count: number,
+    isGroup : boolean,
   ): Observable<any> {
     let headers;
      // Get the JWT token from AuthService
@@ -92,7 +84,8 @@ export class ChatService {
       .set('receiverId', receiverId)
       .set('sort', sort)
       .set('time',  isoTime)
-      .set('count', count.toString());
+      .set('count', count.toString())
+      .set('isGroup',isGroup);
 
       return this.http.get(`${this.apiUrl}/ConversationHistory`, { headers,params });
   }
@@ -138,6 +131,29 @@ deleteMessagesignal(messageId: number): void {
       return this.http.post(`${this.apiUrl}/SendMessages`, body,{headers});
   }
 
+  
+  sendMessageSignalR(message:any)
+  {
+    this.hubConnection.invoke('SendMessage',message)
+    .catch(err => console.error(err));
+    
+    this.sharedChatService.addMessageToHistory(message);
+
+    console.log("Hi sending message : ",message); 
+  }
+
+
+receiveMessageSignalR(): Observable<any> {
+  return new Observable<any>(observer => {
+    this.hubConnection.on('ReceiveMessage', (data: any) => {
+      observer.next(data);
+
+      console.log("Hi received message : ",data);
+
+    });
+    
+  });
+}
   editMessage(messageId: number, editedContent: string, headers: HttpHeaders): Observable<any> {
     const body = {
       Content: editedContent

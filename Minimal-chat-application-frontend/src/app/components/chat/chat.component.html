@@ -102,7 +102,7 @@
           </div>
       
           <div class="chat-input">
-            <form [formGroup]="sendMessageForm" (ngSubmit)="onSubmit()" style="display: flex;">
+            <form [formGroup]="sendMessageForm" (ngSubmit)="isGroup ? onSubmit() : onSubmit()" style="display: flex;">
               <input type="text" class="sendMessage-input" placeholder="Type your message..." name="message" formControlName="messageText" required style="flex: 1;" />
               <button  class="send-button"  type="submit" style="align-self: flex-end;">Send</button>
             </form>
