@@ -18,6 +18,9 @@ export class RealTimeMessageService {
   addMessageToHistory(message: any) {
     this.conversationHistory.push(message);
     this.conversationHistorySubject.next([...this.conversationHistory]);
+    console.log("conversatino history in signalR addMessgeHistory method ",this.conversationHistory);
+    
+    
   }
 
   getConversationHistoryObservable() {
