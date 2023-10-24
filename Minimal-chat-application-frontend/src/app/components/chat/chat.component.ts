@@ -223,8 +223,12 @@ export class ChatComponent implements OnInit {
       }
 
       this.receiverId = this.selectedUser.id;
+      console.log('conversatino history in fch', this.conversationHistory);
       this.getConversation();
-      
+      console.log(
+        'conversatino history after getconversation',
+        this.conversationHistory
+      );
     }
   }
 
@@ -251,9 +255,13 @@ export class ChatComponent implements OnInit {
               ? new Date(this.conversationHistory[0].timestamp)
               : new Date();
 
-        // this.chatService.sendMessageSignalR(newMessage);
+          // this.chatService.sendMessageSignalR(newMessage);
 
           this.toastr.success('Conversation history retrieved!', 'Success');
+          console.log(
+            'Conversation history in getConversation',
+            this.conversationHistory
+          );
         },
         (error) => {
           console.log('Error fetching conversation history:', error);
@@ -293,6 +301,10 @@ export class ChatComponent implements OnInit {
                 this.toastr.success('Message sent successful!', 'Success');
                 this.time = new Date();
                 this.wholeConversation = [];
+                console.log(
+                  'conversatino history in onsubmit',
+                  this.conversationHistory
+                );
                 this.fetchConversationHistory();
                 this.wholeConversation.push(response);
                 this.sendMessageForm.reset();
@@ -301,37 +313,45 @@ export class ChatComponent implements OnInit {
                 this.toastr.error('Message Sent failed!', 'Error');
               }
             );
-        } 
-        else 
-        {
-          this.groupService.sendMessageToGroupMembers(this.receiverId, msg).subscribe(
-            (response) => {
-              this.toastr.success('Message Sent successfully!', 'Success');
-      
-              this.time = new Date();
-              this.wholeConversation = [];
-              this.fetchConversationHistory();
-      
-              console.log(
-                'conversation history after call fch',
-                this.conversationHistory
-              );
+        } else {
+          this.groupService
+            .sendMessageToGroupMembers(this.receiverId, msg)
+            .subscribe(
+              (response) => {
+                this.toastr.success('Message Sent successfully!', 'Success');
 
-              this.wholeConversation = this.conversationHistory;
-              this.wholeConversation.push(response.newMessage);
-              console.log("newMesage",response.newMessage);
-              
-              console.log('wholeconversation', this.wholeConversation);
+                this.time = new Date();
+                this.wholeConversation = [];
+                this.fetchConversationHistory();
 
+                console.log(
+                  'conversation history after call fch',
+                  this.conversationHistory
+                );
 
-              this.chatService.sendMessageSignalR(response.newMessage);
-      
-              this.sendMessageForm.reset();
-            },
-            (error) => {
-              this.toastr.error('Message Sent failed!', 'Error');
-            }
-          );
+                this.wholeConversation = this.conversationHistory;
+                // this.wholeConversation.push(response.newMessage);
+                // console.log("newMesage",response.newMessage);
+
+                console.log('wholeconversation', this.wholeConversation);
+
+                this.chatService.sendMessageSignalR(response.newMessage);
+
+                this.conversationHistory = this.conversationHistory.filter(
+                  (message, index, self) =>
+                    self.findIndex((m) => m.id === message.id) === index
+                );
+
+                console.log(
+                  'conversation history after filtering',
+                  this.conversationHistory
+                );
+                this.sendMessageForm.reset();
+              },
+              (error) => {
+                this.toastr.error('Message Sent failed!', 'Error');
+              }
+            );
         }
       }
     }
