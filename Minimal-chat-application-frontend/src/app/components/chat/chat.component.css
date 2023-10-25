@@ -97,22 +97,34 @@
 .user-item {
   display: flex;
   align-items: center;
-  padding: 10px;
-  border: 1px solid #ddd;
+  padding: 0px;
   margin-bottom: 10px;
   border-radius: 5px;
   background-color: #fff;
 }
 
+.user-item .user-info {
+  border: 1px solid #ddd; /* Add the border to user-info, not user-item */
+  flex: 1;
+}
+
+.user-info{
+  border: 1px solid #ddd;
+  flex: 1;
+  border-top-left-radius: 17px;
+  border-bottom-left-radius: 17px;
+  border-top-right-radius: 9px;
+  border-bottom-right-radius: 9px;
+}
 
 .avatar-circle {
-  width: 50px; /* Set the width and height of the avatar */
+  width: 50px;
   height: 50px;
   display: flex;
   border-radius: 50%;
   align-items: center;
   justify-content: center;
-  background-color: #9b5198; /* Set the background color of the circle */
+  background-color: #9b5198;
 }
 
 .avatar-initial {
@@ -134,6 +146,7 @@
   margin: 0;
   font-size: 16px;
   margin-left: 18px;
+  padding: 6px;
 }
 
 .sendMessage-input{
@@ -304,16 +317,16 @@
 /* Style the Create and Cancel buttons */
 .create-group-popup button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #8bbabb;
   color: #fff;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
   margin-right: 10px;
+  font-weight: bold;
 }
 
 .create-group-popup button:hover {
-  background-color: #0056b3;
+  background-color: #77aee9;
 }
 
 .user-checkbox label {
@@ -335,3 +348,51 @@
   margin-bottom: 5px;
 }
 
+.create-group{
+  width: 100%;
+  border-radius: 20px;
+  background-color: #182938;
+  color: white;
+  font-weight: bold;
+  border: 6px black;
+  padding: 5px;
+}
+
+
+/* Apply styles to the mention-popup container */
+.mention-popup {
+  background-color: #fff; /* Background color */
+  border: 1px solid #ccc; /* Border */
+  border-radius: 5px; /* Border radius */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Box shadow for a subtle lift */
+}
+
+/* Style the user list items */
+.tag-user-item {
+  list-style: none;
+  padding: 10px;
+  font-weight: bold; /* Make the text bold */
+  cursor: pointer;
+  border-bottom: 1px solid #eee; /* Add a bottom border for separation */
+  transition: background-color 0.3s;
+}
+
+/* On hover, change the background color */
+.tag-user-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* Style the user list items further (adjust as needed) */
+.tag-user-item a {
+  text-decoration: none;
+  color: #333;
+}
+
+.tag-user-item a:hover {
+  text-decoration: underline;
+}
+
+/* Add margin to the last item to avoid a double border */
+.tag-user-item:last-child {
+  margin-bottom: 0;
+}

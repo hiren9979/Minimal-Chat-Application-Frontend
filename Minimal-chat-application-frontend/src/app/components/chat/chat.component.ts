@@ -67,6 +67,12 @@ export class ChatComponent implements OnInit {
   isUserSelected: boolean = true;
   isGroup: boolean = false;
 
+  groupMemberUsernames : any[] = [];
+  gropuAdminId : string = '';
+  tagUser : boolean = false;
+  msg : string = '';
+  tagUserList : any[] = [];
+
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
@@ -101,6 +107,79 @@ export class ChatComponent implements OnInit {
   toggleUserList() {
     this.showUserList = !this.showUserList;
   }
+
+  taggingUser(user:any){
+      const userName = user.userName;
+      if (!this.tagUserList.includes(userName)) {
+        // Push the name to the tagUserList
+        this.tagUserList.push('@' + userName);
+      }
+      else
+      {
+        this.toastr.error('User already tagged', 'Error');
+      }
+    
+      // Create a unique list of user names
+      const uniqueUserList = [...new Set(this.tagUserList)];
+    
+      // Join the unique list with spaces
+      const taggedUsers = uniqueUserList.join(' ');
+      console.log("tagged Users", taggedUsers);
+      
+    
+      // Set the input field value to the concatenated, unique list
+      this.sendMessageForm.controls['messageText'].setValue(taggedUsers);
+    
+      console.log("taggedUserList : ", uniqueUserList);
+      console.log("tagging userName: ", taggedUsers);
+      
+  }
+
+  onMessageInput(message: any) {
+    if (message) {
+      console.log(message.data);
+      
+      console.log("hitting...");
+      if(message.data === "@")
+      {
+        this.tagUser = true;
+        if(this.groupMemberUsernames.length==0)
+          this.fetchGroupMembers();      
+      }
+      else
+        this.tagUser = false;
+    
+    }
+  }
+  
+  fetchGroupMembers()
+  {
+    const groupId = this.receiverId;
+    this.groupService.fetchGroupMembers(groupId).subscribe(
+      (response: any) => {
+        // Handle the retrieved group members, e.g., display them in your UI.
+        this.groupMemberUsernames = response;
+
+        this.groupMemberUsernames = this.groupMemberUsernames.filter(user => user.userId !== this.senderId);
+
+        const groupAdminMember = this.groupMemberUsernames.find(
+          (member: any) => member.isAdmin === true
+        );
+
+        if (groupAdminMember) {
+          this.gropuAdminId = groupAdminMember.userId;
+         }
+
+        console.log('Group members:', this.groupMemberUsernames);
+        return this.groupMemberUsernames;
+      },
+      (error) => {
+        this.toastr.error('Error while fetching group members', 'error');
+        console.error('Error fetching group members:', error);
+      }
+    );
+  }
+  
 
   startChat(userOrGroup: any) {
     // Set the selected user when a user is clicked
@@ -386,7 +465,8 @@ export class ChatComponent implements OnInit {
     if (groupNameControl) {
       const groupName = groupNameControl.value;
 
-      if (this.createGroupForm.valid) {
+      // if (this.createGroupForm.valid)
+       {
         // Check if this.groupName is not null or empty
         if (!groupName) {
           this.toastr.error('Group name is required.', 'Error');

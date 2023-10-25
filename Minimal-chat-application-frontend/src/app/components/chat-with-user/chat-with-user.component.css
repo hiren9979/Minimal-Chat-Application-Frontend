@@ -371,10 +371,16 @@
   flex-direction: column;
   margin-top: 35px;
   border-radius: 5px;
+  margin-bottom: 13px;
+}
+
+.bold-white {
+  font-weight: bold;
+  color: white;
 }
 
 /* Style for the action buttons in the remove-or-admin-popup */
-.remove-or-admin-popup .action-button {
+.remove-or-admin-popup{
   display: inline-block;
   margin-right: 10px;
   margin-bottom: 10px;
@@ -394,14 +400,14 @@
 
 
 .action-button {
-  
-  display: inline-block; 
+  display: inline-block;
   margin-right: 10px;
-  padding: 5px 10px; 
-  background-color: #007bff; 
-  color: #fff; 
-  border: none; 
-  cursor: pointer; 
+  padding: 5px 10px;
+  background-color: #8bbabb;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 .class-notMember{
@@ -463,4 +469,12 @@
 
 .operation-btn:hover{
   background-color: rgb(230, 233, 63);
+}
+
+.adminButton{
+  margin-bottom: 10px;
+}
+
+.removeMember{
+  background-color: red;
 }

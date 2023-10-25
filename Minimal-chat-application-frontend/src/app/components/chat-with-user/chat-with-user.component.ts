@@ -92,6 +92,14 @@ export class ChatWithUserComponent implements OnInit {
 
     console.log(this.conversationHistory);
 
+    this.conversationHistory = this.conversationHistory.filter(
+      (message, index, self) =>
+        self.findIndex((m) => m.id === message.id) === index
+    );
+
+    console.log("After conversationHistory : ",this.conversationHistory);
+    
+
     this.chatService.receiveMessageSignalR().subscribe((message: any) => {
       debugger   
       // this.conversationHistory.push(message);
@@ -105,11 +113,22 @@ export class ChatWithUserComponent implements OnInit {
         this.conversationHistory = history;
       });
 
-      console.log("updated : ",this.conversationHistory);
-      
-      
+      console.log("updated : ",this.conversationHistory);  
     });
   }
+
+  makeAtMentionsBold(content: string): string {
+    const words = content.split(' '); // Split the content into words
+    const processedContent = words.map((word) => {
+      if (word.startsWith('@')) {
+        return `<strong class="bold-white">${word}</strong>`; // Wrap @-prefixed words in <strong> tags
+      } else {
+        return word;
+      }
+    });
+    return processedContent.join(' '); // Join the words back into a string
+  }
+  
 
   private handleEditedMessage(editedMessage: any): void {
     const index = this.conversationHistory.findIndex(
