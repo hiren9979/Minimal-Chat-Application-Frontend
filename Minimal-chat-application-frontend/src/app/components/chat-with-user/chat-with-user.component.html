@@ -35,7 +35,8 @@
         message.senderId.toLowerCase() !== loggedinUserId
         }"
         >
-        <p class="message-content">{{ message.content }}</p>
+        <!-- <p class="message-content">{{ message.content }}</p> -->
+        <p class="message-content" [innerHtml]="makeAtMentionsBold(message.content)"></p>
         <div class="message-meta">
            <!-- <button class="edit-button" (click)="editMessage(message.id)">
               <i class="bi bi-pen"></i>
@@ -119,11 +120,11 @@
 
 <div class="remove-or-admin-popup" *ngIf="isRemoveOrAdminPopupOpen">
    <div class="header-close">
-       <button class="close-button1" (click)="closeRemoveOrAdminPopup()"><i class="bi bi-x close-icon"></i></button>
+       <button class="close-button1 " (click)="closeRemoveOrAdminPopup()"><i class="bi bi-x close-icon"></i></button>
    </div>
    <div class="action-buttons">
-       <button class="action-button btn btn-dark" (click)="removeGroupMember(selectedMember)">Remove Member</button>
-       <button class="action-button" (click)="makeUserAdmin()">Make Admin</button>
+       <button class="action-button removeMember btn mb-2 mb-md-0 btn-secondary btn-block btn-round" (click)="removeGroupMember(selectedMember)">Remove Member <i class="bi bi-trash"></i></button>
+       <button class="action-button adminButton  btn mb-2 mb-md-0 btn-secondary btn-block btn-round" (click)="makeUserAdmin()">Make Admin <i class="bi bi-person-fill-check"></i></button>
    </div>
 </div>
 

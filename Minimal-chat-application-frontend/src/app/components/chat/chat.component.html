@@ -1,117 +1,211 @@
 <div class="chat-container">
-  <ng-container >
-  <div class="chat-section" *ngIf="showUserList; else searchResultsTemplate">
-    <button (click)="openCreateGroupPopup()">Create Group</button>
+  <ng-container>
+    <div class="chat-section" *ngIf="showUserList; else searchResultsTemplate">
+      <button class="create-group" (click)="openCreateGroupPopup()">
+        Create Group
+      </button>
 
-
-    <h2>Group List</h2>
-    <ul class="user-list-items">
-      <li class="user-item" *ngFor="let group of groupList" (click)="startChat(group)">
-        <div class="avatar-circle">
-          <p class="avatar-initial">{{ group.name.charAt(0) | titlecase }}</p>
-        </div>
-        <div class="user-info">
-          <p class="user-name">{{ group.name | titlecase }}</p>
-          <!-- Add other group details here if needed -->
-        </div>
-      </li>
-    </ul>
-
-    <h2>User List</h2>
-    <ul class="user-list-items">
-      <li class="user-item" *ngFor="let user of userList" (click)="startChat(user)">
-        <div class="avatar-circle">
-          <p class="avatar-initial">{{ user.firstName.charAt(0) | titlecase  }}</p>
-        </div>
-        <div class="user-info">
-          <p class="user-name">{{ user.firstName | titlecase  }}</p>
-          <!-- Add other user details here if needed -->
-        </div>
-      </li>
-    </ul>
-
-     <!-- pop up open when click on create Gropu -->
-     <div class="create-group-popup" *ngIf="showCreateGroupPopup">
-      <h3>Create a Group</h3>
-      <form [formGroup]="createGroupForm" (ngSubmit)="createGroup()">
-        <div class="form-input">
-          <input type="text" placeholder="Group Name" formControlName="groupName">
-          <!-- Add more input fields and controls for the "Create Group" form if needed -->
-          <div class="checkbox-user">
-            <div *ngFor="let user of userList" class="user-checkbox">
-              <label>
-                <input type="checkbox" [checked]="selectedUserIds.includes(user.id)" (change)="toggleUserSelection(user.id)">
-                <div class="userName">{{ user.firstName }}</div>
-              </label>
-            </div>
+      <h2>Group List</h2>
+      <ul class="user-list-items">
+        <li
+          class="user-item"
+          *ngFor="let group of groupList"
+          (click)="startChat(group)"
+        >
+          <div class="avatar-circle">
+            <p class="avatar-initial">{{ group.name.charAt(0) | titlecase }}</p>
           </div>
-          <!-- <select multiple formControlName="memberIds">
-            <option *ngFor="let user of userList" [value]="user.id">{{ user.firstName }}</option>
-          </select> -->
-        </div>
-        <div class="form-buttons">
-          <button type="submit">Create</button>
-          <button (click)="closeCreateGroupPopup()">Cancel</button>
-        </div>
-      </form>
-    </div>
-   
-  </div>
-  </ng-container>
+          <div class="user-info">
+            <p class="user-name">{{ group.name | titlecase }}</p>
+            <!-- Add other group details here if needed -->
+          </div>
+        </li>
+      </ul>
 
-    <!-- Search Results -->
-    <ng-template #searchResultsTemplate>
-      <div class="chat-section">
-        <div class="search-results-header">
-          <h2>Search Results for "{{ searchQuery }}"</h2>
-          <button class="close-button" (click)="showUserList = true">Close</button>
-        </div>
-        <div class="chat-messages-container" *ngIf="!searchResults || searchResults.length === 0">
-          <p>No search results found.</p>
-        </div>
-        <div class="chat-messages-container" *ngFor="let message of searchResults">
-            <div
-              [ngClass]="{
-                'chat-messages sender': message.senderId.toLowerCase() === loggedinUserId,
-                'chat-messages receiver': message.senderId.toLowerCase() !== loggedinUserId
-              }"
-            >
-              <p class="message-content">{{ message.content }}</p>
-              <div class="message-meta">
-                <p class="message-timestamp">{{ message.timestamp | date: "shortTime" }}</p>
+      <h2>User List</h2>
+      <ul class="user-list-items">
+        <li
+          class="user-item"
+          *ngFor="let user of userList"
+          (click)="startChat(user)"
+        >
+          <div class="avatar-circle">
+            <p class="avatar-initial">
+              {{ user.firstName.charAt(0) | titlecase }}
+            </p>
+          </div>
+          <div class="user-info">
+            <p class="user-name">{{ user.firstName | titlecase }}</p>
+            <!-- Add other user details here if needed -->
+          </div>
+        </li>
+      </ul>
+
+      <!-- pop up open when click on create Gropu -->
+      <div class="create-group-popup" *ngIf="showCreateGroupPopup">
+        <h3>Create a Group</h3>
+        <form [formGroup]="createGroupForm" (ngSubmit)="createGroup()">
+          <div class="form-input">
+            <input
+              type="text"
+              placeholder="Group Name"
+              formControlName="groupName"
+            />
+            <!-- Add more input fields and controls for the "Create Group" form if needed -->
+            <div class="checkbox-user">
+              <div *ngFor="let user of userList" class="user-checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    [checked]="selectedUserIds.includes(user.id)"
+                    (change)="toggleUserSelection(user.id)"
+                  />
+                  <div class="userName">{{ user.firstName }}</div>
+                </label>
               </div>
             </div>
-        </div>
-        <!-- Close button to switch back to user list -->
+          </div>
+          <div class="form-buttons">
+            <button
+              class="btn mb-2 mb-md-0 btn-secondary btn-block btn-round"
+              type="submit"
+            >
+              Create
+            </button>
+            <button
+              class="btn mb-2 mb-md-0 btn-secondary btn-block btn-round"
+              (click)="closeCreateGroupPopup()"
+            >
+              Cancel <i class="bi bi-x-circle"></i>
+            </button>
+          </div>
+        </form>
       </div>
-    </ng-template>
-
-
-    <div class="chat-container">
-        <div class="chat-with-user">
-          <div class="search-container" *ngIf="selectedUser">
-            <div class="search-bar">
-               <input type="text" [(ngModel)]="searchQuery" placeholder="Search messages" />
-               <button class="send-button" type="button" style="align-self: flex-end;" (click)="searchMessages()">
-                  <i class="bi bi-search"  style="font-size: 29px;width: 30px; color: white; font-weight: 700;"></i></button>
-             </div>
-            </div>
-          <div  class="chat-messages" #ConversationHistory [scrollTop]="0"
-          style="overflow-y: scroll;" (scroll)="onScroll($event)" >
-            <chat-with-user [conversationHistory]="wholeConversation" [isUserSelected]="isUserSelected"  [receiverName]="receiverName" [receiverId]="receiverId"></chat-with-user>
-          </div>
-      
-          <div class="chat-input">
-            <form [formGroup]="sendMessageForm" (ngSubmit)="isGroup ? onSubmit() : onSubmit()" style="display: flex;">
-              <input type="text" class="sendMessage-input" placeholder="Type your message..." name="message" formControlName="messageText" required style="flex: 1;" />
-              <button  class="send-button"  type="submit" style="align-self: flex-end;">Send</button>
-            </form>
-          </div>
-          <small *ngIf="sendMessageForm?.get('messageText')?.hasError('required') && sendMessageForm?.get('messageText')?.touched" style="color: red;">
-            *Message is required
-          </small>
-      
-        </div>
     </div>
-  
-</div>  
+  </ng-container>
+
+  <!-- Search Results -->
+  <ng-template #searchResultsTemplate>
+    <div class="chat-section">
+      <div class="search-results-header">
+        <h2>Search Results for "{{ searchQuery }}"</h2>
+        <button class="close-button" (click)="showUserList = true">
+          Close
+        </button>
+      </div>
+      <div
+        class="chat-messages-container"
+        *ngIf="!searchResults || searchResults.length === 0"
+      >
+        <p>No search results found.</p>
+      </div>
+      <div
+        class="chat-messages-container"
+        *ngFor="let message of searchResults"
+      >
+        <div
+          [ngClass]="{
+            'chat-messages sender':
+              message.senderId.toLowerCase() === loggedinUserId,
+            'chat-messages receiver':
+              message.senderId.toLowerCase() !== loggedinUserId
+          }"
+        >
+          <p class="message-content">{{ message.content }}</p>
+          <div class="message-meta">
+            <p class="message-timestamp">
+              {{ message.timestamp | date : "shortTime" }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Close button to switch back to user list -->
+    </div>
+  </ng-template>
+
+  <div class="chat-container">
+    <div class="chat-with-user">
+      <div class="search-container" *ngIf="selectedUser">
+        <div class="search-bar">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            placeholder="Search messages"
+          />
+          <button
+            class="send-button"
+            type="button"
+            style="align-self: flex-end"
+            (click)="searchMessages()"
+          >
+            <i
+              class="bi bi-search"
+              style="
+                font-size: 29px;
+                width: 30px;
+                color: white;
+                font-weight: 700;
+              "
+            ></i>
+          </button>
+        </div>
+      </div>
+      <div
+        class="chat-messages"
+        #ConversationHistory
+        [scrollTop]="0"
+        style="overflow-y: scroll"
+        (scroll)="onScroll($event)"
+      >
+        <chat-with-user
+          [conversationHistory]="wholeConversation"
+          [isUserSelected]="isUserSelected"
+          [receiverName]="receiverName"
+          [receiverId]="receiverId"
+        ></chat-with-user>
+      </div>
+
+      <div class="chat-input">
+        <form
+          [formGroup]="sendMessageForm"
+          (ngSubmit)="isGroup ? onSubmit() : onSubmit()"
+          style="display: flex"
+        >
+          <input
+          type="text"
+          class="sendMessage-input"
+          placeholder="Type your message..."
+          name="message"
+          formControlName="messageText"
+          required
+          style="flex: 1;"
+          (input)="onMessageInput($event)"
+          />
+          <button
+            class="send-button"
+            type="submit"
+            style="align-self: flex-end"
+          >
+            Send
+          </button>
+        </form>
+      </div>
+      <small
+        *ngIf="
+          sendMessageForm?.get('messageText')?.hasError('required') &&
+          sendMessageForm?.get('messageText')?.touched
+        "
+        style="color: red"
+      >
+        *Message is required
+      </small>
+      <div *ngIf="tagUser" class="mention-popup">
+        <ul>
+          <li *ngFor="let user of groupMemberUsernames" class="tag-user-item" (click)="taggingUser(user)">
+            {{ user.userName }}
+          </li>
+        </ul>
+      </div>      
+    </div>
+  </div>
+</div>
