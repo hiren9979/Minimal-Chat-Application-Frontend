@@ -1,0 +1,37 @@
+<h1 class="header-text">Tagged Messages</h1>
+<div class="tagged-messages">
+  <!-- Replace the following with a loop to generate each message -->
+  <div
+    class="message"
+    *ngFor="let message of taggedMessages"
+    (click)="openMessageInfo(message)"
+  >
+    <div class="message-header">
+      <span class="sender">{{ message.content }}</span>
+      <span class="timestamp">{{ message.timestamp }}</span>
+    </div>
+  </div>
+</div>
+<div class="message-details-popup" *ngIf="isopenMessageInfo">
+    <div class="popupContent">
+      <h2 class="popup-title">Message Details</h2>
+      <div class="message-content">
+        <p class="label">Content:</p> {{ selectedMessage.content }}
+      </div>
+      <div class="message-timestamp">
+        <p class="label">Timestamp:</p> {{ selectedMessage.timestamp }}
+      </div>
+      <div class="message-sender">
+        <p class="label">Sender:</p>
+        <div class="sender-info">
+          <p class="label">Username:</p> {{ selectedMessage.sender.userName }}
+        </div>
+        <div class="sender-info">
+            <p class="label">Email:</p> {{ selectedMessage.sender.email }}
+        </div>
+    <button class="close-button" (click)="closeMessageInfo()">Close</button>
+
+      </div>
+    </div>
+  </div>
+  

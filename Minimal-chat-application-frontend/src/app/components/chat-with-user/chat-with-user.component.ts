@@ -118,6 +118,11 @@ export class ChatWithUserComponent implements OnInit {
   }
 
   makeAtMentionsBold(content: string): string {
+
+    if (content.startsWith("[[]]")) {
+      content = content.slice(4);
+    }
+    
     const words = content.split(' '); // Split the content into words
     const processedContent = words.map((word) => {
       if (word.startsWith('@')) {

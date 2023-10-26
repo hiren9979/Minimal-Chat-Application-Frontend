@@ -19,6 +19,7 @@ import {
 } from '@angular/core';
 import { Inject } from '@angular/core';
 import { GroupService } from 'src/app/service/group.service';
+import { RealTimeMessageService } from 'src/app/service/real-time-message.service';
 
 /* Create a new injection token for injecting the window into a component. */
 export const WINDOW = new InjectionToken('WindowToken');
@@ -67,11 +68,12 @@ export class ChatComponent implements OnInit {
   isUserSelected: boolean = true;
   isGroup: boolean = false;
 
-  groupMemberUsernames : any[] = [];
-  gropuAdminId : string = '';
-  tagUser : boolean = false;
-  msg : string = '';
-  tagUserList : any[] = [];
+  groupMemberUsernames: any[] = [];
+  gropuAdminId: string = '';
+  tagUser: boolean = false;
+  msg: string = '';
+  tagUserList: any[] = [];
+  isUserTagged: boolean = false;
 
   constructor(
     private http: HttpClient,
@@ -80,6 +82,7 @@ export class ChatComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private chatService: ChatService,
+    private sharedService: RealTimeMessageService,
     private groupService: GroupService,
     @Inject(WINDOW) private window: Window
   ) {}
@@ -108,59 +111,58 @@ export class ChatComponent implements OnInit {
     this.showUserList = !this.showUserList;
   }
 
-  taggingUser(user:any){
-      const userName = user.userName;
-      if (!this.tagUserList.includes(userName)) {
-        // Push the name to the tagUserList
-        this.tagUserList.push('@' + userName);
-      }
-      else
-      {
-        this.toastr.error('User already tagged', 'Error');
-      }
-    
-      // Create a unique list of user names
-      const uniqueUserList = [...new Set(this.tagUserList)];
-    
-      // Join the unique list with spaces
-      const taggedUsers = uniqueUserList.join(' ');
-      console.log("tagged Users", taggedUsers);
-      
-    
-      // Set the input field value to the concatenated, unique list
-      this.sendMessageForm.controls['messageText'].setValue(taggedUsers);
-    
-      console.log("taggedUserList : ", uniqueUserList);
-      console.log("tagging userName: ", taggedUsers);
-      
+  taggingUser(user: any) {
+    const userName = user.userName;
+    if (!this.tagUserList.includes('@' + userName)) {
+      // Push the name to the tagUserList
+      this.tagUserList.push('@' + userName);
+    } else {
+      this.toastr.error('User already tagged', 'Error');
+    }
+
+    // Create a unique list of user names
+    const uniqueUserList = [...new Set(this.tagUserList)];
+
+    // Join the unique list with spaces
+    const taggedUsers = uniqueUserList.join(' ');
+    console.log('tagged Users', taggedUsers);
+
+    // Set the input field value to the concatenated, unique list
+    this.sendMessageForm.controls['messageText'].setValue(taggedUsers);
+    this.isUserTagged = true;
+
+    console.log('taggedUserList : ', uniqueUserList);
+    console.log('tagging userName: ', taggedUsers);
   }
 
   onMessageInput(message: any) {
     if (message) {
       console.log(message.data);
-      
-      console.log("hitting...");
-      if(message.data === "@")
-      {
+
+      if (this.tagUserList.length === 0) this.isUserTagged = false;
+
+      console.log('isUserTagged', this.isUserTagged);
+
+      console.log('hitting...');
+      if (message.data === '@') {
         this.tagUser = true;
-        if(this.groupMemberUsernames.length==0)
-          this.fetchGroupMembers();      
-      }
-      else
+        if (this.groupMemberUsernames.length == 0) this.fetchGroupMembers();
+      } else {
         this.tagUser = false;
-    
+      }
     }
   }
-  
-  fetchGroupMembers()
-  {
+
+  fetchGroupMembers() {
     const groupId = this.receiverId;
     this.groupService.fetchGroupMembers(groupId).subscribe(
       (response: any) => {
         // Handle the retrieved group members, e.g., display them in your UI.
         this.groupMemberUsernames = response;
 
-        this.groupMemberUsernames = this.groupMemberUsernames.filter(user => user.userId !== this.senderId);
+        this.groupMemberUsernames = this.groupMemberUsernames.filter(
+          (user) => user.userId !== this.senderId
+        );
 
         const groupAdminMember = this.groupMemberUsernames.find(
           (member: any) => member.isAdmin === true
@@ -168,7 +170,7 @@ export class ChatComponent implements OnInit {
 
         if (groupAdminMember) {
           this.gropuAdminId = groupAdminMember.userId;
-         }
+        }
 
         console.log('Group members:', this.groupMemberUsernames);
         return this.groupMemberUsernames;
@@ -179,7 +181,6 @@ export class ChatComponent implements OnInit {
       }
     );
   }
-  
 
   startChat(userOrGroup: any) {
     // Set the selected user when a user is clicked
@@ -335,7 +336,6 @@ export class ChatComponent implements OnInit {
               : new Date();
 
           // this.chatService.sendMessageSignalR(newMessage);
-
           this.toastr.success('Conversation history retrieved!', 'Success');
           console.log(
             'Conversation history in getConversation',
@@ -359,7 +359,7 @@ export class ChatComponent implements OnInit {
 
   onSubmit() {
     if (this.sendMessageForm.valid) {
-      const msg = this.sendMessageForm.value;
+      let msg = this.sendMessageForm.value;
 
       // Get the JWT token from AuthService
       const token = this.authService.getToken();
@@ -393,6 +393,24 @@ export class ChatComponent implements OnInit {
               }
             );
         } else {
+          console.log('message in group : ', msg);
+
+          let i;
+          for (i = 0; i < this.tagUserList.length; i++) {
+            if (msg.messageText.includes(this.tagUserList[i])) {
+              this.isUserTagged = true;
+              const replacedMessage = '[[]]' + msg.messageText;
+              msg.messageText = replacedMessage;
+
+              console.log('after adding message : ', msg);
+              break;
+            }
+          }
+
+          if (i === this.tagUserList.length) {
+            this.tagUserList = [];
+          }
+
           this.groupService
             .sendMessageToGroupMembers(this.receiverId, msg)
             .subscribe(
@@ -466,7 +484,7 @@ export class ChatComponent implements OnInit {
       const groupName = groupNameControl.value;
 
       // if (this.createGroupForm.valid)
-       {
+      {
         // Check if this.groupName is not null or empty
         if (!groupName) {
           this.toastr.error('Group name is required.', 'Error');
