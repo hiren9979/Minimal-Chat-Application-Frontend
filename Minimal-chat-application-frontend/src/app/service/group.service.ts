@@ -153,4 +153,8 @@ export class GroupService {
       options
     );
   }
+
+  fetchTaggedMessages(): Observable<any> {
+    return this.http.get('https://localhost:7288/api/Message/TaggedMessages');
+  }
 }

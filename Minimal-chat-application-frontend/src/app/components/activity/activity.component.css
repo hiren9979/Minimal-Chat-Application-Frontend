@@ -1,0 +1,126 @@
+/* Reset default margin and padding for all elements */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Style the container for tagged messages */
+.tagged-messages {
+  max-width: 600px; /* Adjust as needed */
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Style each individual message */
+.message {
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+/* Style message header (sender and timestamp) */
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.sender {
+  font-weight: bold;
+}
+
+.timestamp {
+  color: #555;
+  font-size: 14px;
+}
+
+/* Style message content */
+.message-content {
+  font-size: 16px;
+}
+
+.message-details-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background overlay */
+}
+
+.popupContent {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  text-align: left;
+  max-width: 400px;
+  z-index: 1000;
+}
+
+.popup-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.label {
+  font-weight: bold;
+  display: inline; /* Keep label and content on the same line */
+}
+
+/* Rest of your CSS styles */
+.message-content {
+  margin-bottom: 10px;
+}
+
+.message-timestamp {
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.message-sender {
+  margin-bottom: 10px;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.sender-info {
+  padding-left: 10px;
+}
+
+.sender-username {
+  margin-bottom: 5px;
+}
+
+.close-button {
+  background-color: #d3735e;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-top: 15px;
+  margin-left: 80px;
+}
+
+.close-button:hover {
+  background-color: red;
+}
+
+.header-text{
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  text-align: center;
+}

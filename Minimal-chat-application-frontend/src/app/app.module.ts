@@ -22,7 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { RequestlogComponent } from './components/requestlog/requestlog.component';
 import { ErrorComponent } from './components/error/error.component';
-import { ChatInGroupComponent } from './components/chat-in-group/chat-in-group.component';
+import { ActivityComponent } from './components/activity/activity.component';
 
 @NgModule({
   exports: [FormsModule, MatDialogModule, MatFormFieldModule, MatButtonModule, MatInputModule],
@@ -37,7 +37,7 @@ import { ChatInGroupComponent } from './components/chat-in-group/chat-in-group.c
     ChatWithUserComponent,
     RequestlogComponent,
     ErrorComponent,
-    ChatInGroupComponent
+    ActivityComponent,
   ],
   imports: [
     BrowserModule,
