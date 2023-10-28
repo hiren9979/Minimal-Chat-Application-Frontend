@@ -17,8 +17,8 @@ export class AuthService {
     private toastr : ToastrService,
     ) { }
 
-  signup(user:any):Observable<any>{
-      return this.http.post(`${this.apiUrl}/Register`,user);
+  signup(userRegisterModel:any):Observable<any>{
+      return this.http.post(`${this.apiUrl}/Register`,userRegisterModel);
   }
 
   login(user:any):Observable<any>{

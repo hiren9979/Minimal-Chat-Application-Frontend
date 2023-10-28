@@ -416,6 +416,7 @@ export class ChatComponent implements OnInit {
             .subscribe(
               (response) => {
                 this.toastr.success('Message Sent successfully!', 'Success');
+                this.tagUserList = [];
 
                 this.time = new Date();
                 this.wholeConversation = [];
