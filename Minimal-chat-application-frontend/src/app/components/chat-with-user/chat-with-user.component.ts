@@ -90,7 +90,7 @@ export class ChatWithUserComponent implements OnInit {
       groupName: ['', Validators.required], // You can add more validators if needed
     });
 
-    console.log(this.conversationHistory);
+    console.log("chat with user : ", this.conversationHistory);
 
     this.conversationHistory = this.conversationHistory.filter(
       (message, index, self) =>
@@ -99,21 +99,28 @@ export class ChatWithUserComponent implements OnInit {
 
     console.log("After conversationHistory : ",this.conversationHistory);
     
-
+    this.conversationHistory = this.conversationHistory.filter(
+      (message, index, self) =>
+        self.findIndex((m) => m.id === message.id) === index
+    );
+  
+    const uniqueMessageIds = new Set<number>();
+  
     this.chatService.receiveMessageSignalR().subscribe((message: any) => {
-      debugger   
-      // this.conversationHistory.push(message);
-      console.log(this.conversationHistory);
-      console.log("New message", message)
-
-      this.sharedChatService.getConversationHistory();
-
-      this.sharedChatService.getConversationHistoryObservable().subscribe((history: any[]) => {
+      debugger;
+  
+      if (!uniqueMessageIds.has(message.id)) {
+        // Add the message to the unique set
+        uniqueMessageIds.add(message.id);
+  
+        // Push the message to the conversationHistory
+        this.conversationHistory.push(message);
+  
         // Handle updates to the conversation history in real-time
-        this.conversationHistory = history;
-      });
-
-      console.log("updated : ",this.conversationHistory);  
+        this.sharedChatService.getConversationHistory();
+      }
+  
+      // ... Other code ...
     });
   }
 
