@@ -19,7 +19,6 @@ import { GroupService } from 'src/app/service/group.service';
 import { Location } from '@angular/common';
 import { RealTimeMessageService } from 'src/app/service/real-time-message.service';
 
-
 @Component({
   selector: 'chat-with-user',
   templateUrl: './chat-with-user.component.html',
@@ -55,10 +54,10 @@ export class ChatWithUserComponent implements OnInit {
   @Input() isUserSelected: boolean = false;
   isDropdownOpen: boolean = false;
 
-  isAddGroupMemberPopupOpen : boolean = false;
+  isAddGroupMemberPopupOpen: boolean = false;
   userNotInGroup!: any[];
   wantToAddMembers: string[] = [];
-
+  hoveredMessageId: number | null = null;
 
   @ViewChild('forScrolling') forScrolling!: ElementRef;
 
@@ -72,8 +71,8 @@ export class ChatWithUserComponent implements OnInit {
     private chatService: ChatService,
     private cdRef: ChangeDetectorRef,
     private chatComponent: ChatComponent,
-    private location : Location,
-    private sharedChatService : RealTimeMessageService,
+    private location: Location,
+    private sharedChatService: RealTimeMessageService
   ) {}
 
   ngOnInit() {
@@ -90,46 +89,45 @@ export class ChatWithUserComponent implements OnInit {
       groupName: ['', Validators.required], // You can add more validators if needed
     });
 
-    console.log("chat with user : ", this.conversationHistory);
+    console.log('chat with user : ', this.conversationHistory);
 
     this.conversationHistory = this.conversationHistory.filter(
       (message, index, self) =>
         self.findIndex((m) => m.id === message.id) === index
     );
 
-    console.log("After conversationHistory : ",this.conversationHistory);
-    
+    console.log('After conversationHistory : ', this.conversationHistory);
+
     this.conversationHistory = this.conversationHistory.filter(
       (message, index, self) =>
         self.findIndex((m) => m.id === message.id) === index
     );
-  
+
     const uniqueMessageIds = new Set<number>();
-  
+
     this.chatService.receiveMessageSignalR().subscribe((message: any) => {
       debugger;
-  
+
       if (!uniqueMessageIds.has(message.id)) {
         // Add the message to the unique set
         uniqueMessageIds.add(message.id);
-  
+
         // Push the message to the conversationHistory
         this.conversationHistory.push(message);
-  
+
         // Handle updates to the conversation history in real-time
         this.sharedChatService.getConversationHistory();
       }
-  
+
       // ... Other code ...
     });
   }
 
   makeAtMentionsBold(content: string): string {
-
-    if (content.startsWith("[[]]")) {
+    if (content.startsWith('[[]]')) {
       content = content.slice(4);
     }
-    
+
     const words = content.split(' '); // Split the content into words
     const processedContent = words.map((word) => {
       if (word.startsWith('@')) {
@@ -140,7 +138,6 @@ export class ChatWithUserComponent implements OnInit {
     });
     return processedContent.join(' '); // Join the words back into a string
   }
-  
 
   private handleEditedMessage(editedMessage: any): void {
     const index = this.conversationHistory.findIndex(
@@ -307,8 +304,7 @@ export class ChatWithUserComponent implements OnInit {
     console.log(this.isGroupNameEditPopupOpen);
   }
 
-  closeEditPopup()
-  {
+  closeEditPopup() {
     this.isGroupNameEditPopupOpen = false;
   }
 
@@ -397,7 +393,10 @@ export class ChatWithUserComponent implements OnInit {
         // Handle a successful response here
         console.log('Group members removed:', response);
 
-        this.toastr.success(`${this.selectedMember.userName} is remove from ${this.receiverName} group`, 'success');
+        this.toastr.success(
+          `${this.selectedMember.userName} is remove from ${this.receiverName} group`,
+          'success'
+        );
         this.closeRemoveOrAdminPopup();
         this.fetchGroupMembers();
       },
@@ -410,7 +409,7 @@ export class ChatWithUserComponent implements OnInit {
   }
 
   openRemoveOrAdminPopup(member: any) {
-    this.isRemoveOrAdminPopupOpen = true; 
+    this.isRemoveOrAdminPopupOpen = true;
     this.selectedMember = member;
   }
 
@@ -419,103 +418,164 @@ export class ChatWithUserComponent implements OnInit {
   }
 
   makeUserAdmin() {
-    console.log("groupId : ", this.receiverId);
-    console.log("userId : ", this.selectedMember.userId);
-    
-    
-    // Call the service method to make the selected member an admin
-    this.groupService.makeUserAdmin(this.receiverId, this.selectedMember.userId).subscribe(
-      (response) => {
-        console.log('User made admin successfully',this.selectedMember);
-        console.log(this.receiverName);
+    console.log('groupId : ', this.receiverId);
+    console.log('userId : ', this.selectedMember.userId);
 
-        this.toastr.success(`${this.selectedMember.userName} is now admin of ${this.receiverName} group`, 'success');
-        this.closeRemoveOrAdminPopup();
+    // Call the service method to make the selected member an admin
+    this.groupService
+      .makeUserAdmin(this.receiverId, this.selectedMember.userId)
+      .subscribe(
+        (response) => {
+          console.log('User made admin successfully', this.selectedMember);
+          console.log(this.receiverName);
+
+          this.toastr.success(
+            `${this.selectedMember.userName} is now admin of ${this.receiverName} group`,
+            'success'
+          );
+          this.closeRemoveOrAdminPopup();
+        },
+        (error) => {
+          console.error('Failed to make the user admin', error);
+
+          if (
+            error.status === 500 ||
+            error.error.error ===
+              'You are not authorized to make this user an admin'
+          ) {
+            // Handle the specific case where the user is not authorized to make the user an admin
+            this.toastr.error(
+              'You are not authorized to make this user an admin',
+              'error'
+            );
+          } else {
+            // Handle other error cases
+            this.toastr.error('Error while making group member admin', 'error');
+          }
+        }
+      );
+  }
+
+  toggleDropdown() {
+    this.isDropdownOpen = true;
+    console.log(this.isDropdownOpen);
+  }
+
+  fetchUsersNotInGroup() {
+    console.log('receiver id ', this.receiverId);
+
+    this.groupService.fetchUsersNotInGroupService(this.receiverId).subscribe(
+      (response) => {
+        this.userNotInGroup = response as any[];
+        console.log('Users not in the group:', this.userNotInGroup);
       },
       (error) => {
-        console.error('Failed to make the user admin', error);
-
-        if (error.status === 500 || error.error.error === "You are not authorized to make this user an admin") {
-          // Handle the specific case where the user is not authorized to make the user an admin
-          this.toastr.error('You are not authorized to make this user an admin', 'error');
-        } else {  
-          // Handle other error cases
-          this.toastr.error('Error while making group member admin', 'error');
-        }
+        console.error('Error fetching users not in the group:', error);
       }
     );
   }
 
-toggleDropdown() {
-  this.isDropdownOpen = true;
-  console.log(this.isDropdownOpen);
-  
-}
-
-fetchUsersNotInGroup()
-{
-
-  console.log("receiver id " , this.receiverId);
-  
-  this.groupService.fetchUsersNotInGroupService(this.receiverId).subscribe(
-    (response) => {  
-      this.userNotInGroup = response as any[];
-      console.log('Users not in the group:', this.userNotInGroup);
-    },
-    (error) => {
-      console.error('Error fetching users not in the group:', error);
-    }
-  );
-}
-
-openAddGroupMemberPopup(){
-  this.isAddGroupMemberPopupOpen = true;
-  this.fetchUsersNotInGroup();
-}
-
-closeAddGroupMemberPopup(){
-
-  this.userNotInGroup.forEach(user => {
-    user.isMemberAdded = false;
-  });
-  this.isAddGroupMemberPopupOpen = false;
-}
-
-addedGroupMember(userId:string){
-  const index = this.wantToAddMembers.indexOf(userId);
-  if (index !== -1) {
-    // User is already added, remove them
-    this.wantToAddMembers.splice(index, 1);
-  } else {
-    // User is not added, add them
-    this.wantToAddMembers.push(userId);
+  openAddGroupMemberPopup() {
+    this.isAddGroupMemberPopupOpen = true;
+    this.fetchUsersNotInGroup();
   }
-  console.log(this.wantToAddMembers);
-  
-}
-  
-isMemberAdded(userId: string): boolean {
-  return this.wantToAddMembers.includes(userId);
-}
 
-AddMembersInGroup()
-{
-  this.groupService.addGroupMembers(this.receiverId, this.wantToAddMembers).subscribe(
-    (response) => {
-      // Handle the success response here
-      console.log('Members added successfully:', response);
-      this.toastr.success(`Members added successfully in ${this.receiverName}`, 'Success');
-      this.closeAddGroupMemberPopup();
-      // Clear the selected members from wantToAddMembers
-      this.wantToAddMembers = [];
-    },
-    (error) => {
-      this.toastr.error('Error while adding members','error');
-      // Handle errors here
-      console.error('Error adding members to the group:', error);
+  closeAddGroupMemberPopup() {
+    this.userNotInGroup.forEach((user) => {
+      user.isMemberAdded = false;
+    });
+    this.isAddGroupMemberPopupOpen = false;
+  }
+
+  addedGroupMember(userId: string) {
+    const index = this.wantToAddMembers.indexOf(userId);
+    if (index !== -1) {
+      // User is already added, remove them
+      this.wantToAddMembers.splice(index, 1);
+    } else {
+      // User is not added, add them
+      this.wantToAddMembers.push(userId);
     }
-  );
+    console.log(this.wantToAddMembers);
+  }
+
+  isMemberAdded(userId: string): boolean {
+    return this.wantToAddMembers.includes(userId);
+  }
+
+  AddMembersInGroup() {
+    this.groupService
+      .addGroupMembers(this.receiverId, this.wantToAddMembers)
+      .subscribe(
+        (response) => {
+          // Handle the success response here
+          console.log('Members added successfully:', response);
+          this.toastr.success(
+            `Members added successfully in ${this.receiverName}`,
+            'Success'
+          );
+          this.closeAddGroupMemberPopup();
+          // Clear the selected members from wantToAddMembers
+          this.wantToAddMembers = [];
+        },
+        (error) => {
+          this.toastr.error('Error while adding members', 'error');
+          // Handle errors here
+          console.error('Error adding members to the group:', error);
+        }
+      );
+  }
+
+  // Handle hover events
+  onMouseEnter(messageId: number) {
+    this.hoveredMessageId = messageId;
+    console.log('hovered messageId : ', this.hoveredMessageId);
+  }
+
+  onMouseLeave() {
+    this.hoveredMessageId = null;
+  }
+
+  reactToMessage(emoji: string) {
+    const messageId = this.hoveredMessageId;
+
+    if (this.hoveredMessageId != null) {
+      this.chatService.addEmojiReaction(this.hoveredMessageId, emoji).subscribe(
+        (response) => {
+          // Handle success response (e.g., show a success message)
+          this.toastr.success("Emoji reaction added successfully",'Success');
+          this.sharedChatService.getConversationHistory();
+          this.cdRef.detectChanges();
+          
+        },
+        (error) => {
+          // Handle error response (e.g., show an error message)
+          this.toastr.error("Failed to add emoji reaction",error);
+          console.error('Failed to add emoji reaction', error);
+        }
+      );
+    }
+  }
+
+  removeEmojiReaction(messageId: number) {
+    // Remove the emoji reaction by sending an empty string or null to the backend
+    this.chatService.addEmojiReaction(messageId, "NULL").subscribe(
+      (response) => {
+        // Handle success response (e.g., show a success message)
+        this.toastr.success("Emoji reaction removed successfully", 'Success');
+        console.log('Emoji reaction removed successfully');
+        
+        // Trigger change detection to refresh the component
+        this.cdRef.detectChanges();
+      },
+      (error) => {
+        // Handle error response (e.g., show an error message)
+        this.toastr.error("Failed to remove emoji reaction", error);
+        console.error('Failed to remove emoji reaction', error);
+      }
+    );
+  }
+  
 
 }
 
-}

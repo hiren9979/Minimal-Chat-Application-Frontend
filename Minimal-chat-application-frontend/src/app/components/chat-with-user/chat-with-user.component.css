@@ -478,3 +478,7 @@
 .removeMember{
   background-color: red;
 }
+
+.emoji-button{
+  border-radius: 50%;
+}

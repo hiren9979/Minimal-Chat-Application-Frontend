@@ -77,15 +77,21 @@ handleTimeRangeClick(minutes: number): void {
 
       this.logService.getLogs(headers, startTimeToSend, endTimeToSend).subscribe(
         (logs) => {
-          this.logs = logs;
-          console.log(logs);
-          this.toastr.success('Log fetch successfully', 'success');
+          if (logs.message && logs.message === "No logs found") {
+            this.toastr.info('No logs found', 'Info'); 
+            this.logs = [];
+          } else {
+            this.logs = logs;
+            console.log(logs);
+            this.toastr.success('Log fetch successfully', 'Success');
+          }
         },
         (error) => {
-          this.toastr.error('Error in fetch log', 'error');
+          this.toastr.error('Error in fetch log', 'Error');
           console.error('Error fetching logs:', error);
         }
       );
+      
     }
   }
 }
