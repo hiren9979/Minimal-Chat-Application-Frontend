@@ -66,6 +66,11 @@ export class LogService {
     
       const options = { headers, params };
     
-      return this.http.get(`${this.apiUrl}/GetLog`, options);
+      return this.http.get(`${this.apiUrl}/GetLog`, options).pipe(
+        catchError((error: any) => {
+          console.error('Error occurred:', error);
+          return throwError(error);
+        })
+      );
     }
 }

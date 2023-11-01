@@ -182,5 +182,10 @@ receiveMessageSignalR(): Observable<any> {
     return this.http.get(`${this.apiUrl}/SearchConversations?query=${query}&receiverId=${receiverId}`, { headers });
   }
 
+  addEmojiReaction(messageId: number, emoji: string) {
+    const url = `${this.apiUrl}/AddEmojiReaction?messageId=${messageId}&emoji=${emoji}`;
+    return this.http.post(url,null);
+  }
+
   // Add a method to handle edited messages received from the server
 }

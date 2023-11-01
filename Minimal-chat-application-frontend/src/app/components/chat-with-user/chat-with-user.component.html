@@ -1,55 +1,77 @@
-
 <!-- Chat Header -->
 <div class="chat">
   <div *ngIf="receiverName" class="chat-header">
-     <div class="avatar-circle">
-        <p class="avatar-initial">{{ receiverName.charAt(0) | titlecase }}</p>
-     </div>
-     <div class="chat-header-info">
-        <h2>{{ receiverName | titlecase }}</h2>
-        <!-- Add any additional user information here, such as status, etc. -->
-     </div>
-     <div class="group-edit-button" *ngIf="!isUserSelected">
-      <i class="bi bi-three-dots-vertical " (click)="toggleDropdown()"></i>
+    <div class="avatar-circle">
+      <p class="avatar-initial">{{ receiverName.charAt(0) | titlecase }}</p>
+    </div>
+    <div class="chat-header-info">
+      <h2>{{ receiverName | titlecase }}</h2>
+      <!-- Add any additional user information here, such as status, etc. -->
+    </div>
+    <div class="group-edit-button" *ngIf="!isUserSelected">
+      <i class="bi bi-three-dots-vertical" (click)="toggleDropdown()"></i>
 
       <div class="dropdown-menu" *ngIf="isDropdownOpen">
-         <!-- Add your dropdown menu content here -->
-         <button class="operation-btn"  (click)="openEditPopup()">Edit</button>
-         <button class="operation-btn" (click)="openShowMemberPopup()">Show Members</button>
-         <button class="operation-btn" (click)="openAddGroupMemberPopup()">Add</button>
+        <!-- Add your dropdown menu content here -->
+        <button class="operation-btn" (click)="openEditPopup()">Edit</button>
+        <button class="operation-btn" (click)="openShowMemberPopup()">
+          Show Members
+        </button>
+        <button class="operation-btn" (click)="openAddGroupMemberPopup()">
+          Add
+        </button>
       </div>
     </div>
-
   </div>
   <!-- Chat Messages Container -->
   <div
-     class="chat-messages-container"
-     #forScrolling
-     *ngFor="let message of conversationHistory"
-     >
-     <div
-        [ngClass]="{
+    class="chat-messages-container"
+    #forScrolling
+    *ngFor="let message of conversationHistory"
+  >
+    <div
+      [ngClass]="{
         'chat-messages sender':
-        message.senderId.toLowerCase() === loggedinUserId,
+          message.senderId.toLowerCase() === loggedinUserId,
         'chat-messages receiver':
-        message.senderId.toLowerCase() !== loggedinUserId
-        }"
-        >
-        <!-- <p class="message-content">{{ message.content }}</p> -->
-        <p class="message-content" [innerHtml]="makeAtMentionsBold(message.content)"></p>
-        <div class="message-meta">
-           <!-- <button class="edit-button" (click)="editMessage(message.id)">
+          message.senderId.toLowerCase() !== loggedinUserId
+      }"
+      (mouseenter)="onMouseEnter(message.id)"
+      (mouseleave)="onMouseLeave()"
+    >
+      <!-- <p class="message-content">{{ message.content }}</p> -->
+      <p
+        class="message-content"
+        [innerHtml]="makeAtMentionsBold(message.content)"
+      ></p>
+      <div class="message-meta">
+        <!-- <button class="edit-button" (click)="editMessage(message.id)">
               <i class="bi bi-pen"></i>
               </button> -->
-           <div class="edit-button" *ngIf="message.senderId === loggedinUserId">
-              <i class="bi bi-pen" (click)="openPopUp(message.id)"></i>
-           </div>
-           <p class="message-timestamp">
-              {{ message.timestamp | date : "shortTime" }}
-           </p>
+        <div class="edit-button" *ngIf="message.senderId === loggedinUserId">
+          <i class="bi bi-pen" (click)="openPopUp(message.id)"></i>
         </div>
-        <!-- bootstrap popup -->
-        <div
+        <p class="message-timestamp">
+          {{ message.timestamp | date : "shortTime" }}
+        </p>
+      </div>
+
+      <!-- Emoji popup -->
+      <div class="emoji-reactions" *ngIf="hoveredMessageId === message.id">
+         <!-- Add your emoji buttons/icons here -->
+         <button class="emoji-button" (click)="reactToMessage('👍')">👍</button>
+         <button class="emoji-button" (click)="reactToMessage('❤️')">❤️</button>
+         <button class="emoji-button" (click)="reactToMessage('😄')">😄</button>
+         <button class="emoji-button" (click)="reactToMessage('🔥')">🔥</button>
+         <button class="emoji-button" (click)="reactToMessage('👎')">👎</button>
+      </div>
+
+      <div class="emoji-reaction-display" (click)="removeEmojiReaction(message.id)" *ngIf = "message.emojiReaction != null && message.emojiReaction != 'NULL'" >
+         {{message.emojiReaction}}
+      </div>
+      
+      <!-- bootstrap popup -->
+      <div
         *ngIf="isOpenPopUp && editingMessageId === message.id"
         [attr.id]="'modalSubscriptionForm_' + message.id"
         tabindex="-1"
@@ -57,76 +79,110 @@
         role="dialog"
         aria-labelledby="myModalLabel"
         aria-hidden="true"
-        >
-        <div *ngIf="editingMessageId === message.id " class="editing-dialog">
-          <input type="text" [(ngModel)]="editedMessageContent" class="edit-input" aria-label="Default" />
+      >
+        <div *ngIf="editingMessageId === message.id" class="editing-dialog">
+          <input
+            type="text"
+            [(ngModel)]="editedMessageContent"
+            class="edit-input"
+            aria-label="Default"
+          />
           <div class="button-container">
-              <button
-                 class="save-button btn btn-success"
-                 (click)="saveEditedMessage()"
-                 >
+            <button
+              class="save-button btn btn-success"
+              (click)="saveEditedMessage()"
+            >
               Save
-              </button>
-              <button class="cancel-button btn btn-danger" (click)="cancelEdit()">
+            </button>
+            <button class="cancel-button btn btn-danger" (click)="cancelEdit()">
               Cancel
-              </button>
-              <button
-                 class="delete-button btn btn-danger"
-                 (click)="deleteMessage(message.id)"
-                 >
+            </button>
+            <button
+              class="delete-button btn btn-danger"
+              (click)="deleteMessage(message.id)"
+            >
               Delete
-              </button>
-           </div>
+            </button>
+          </div>
         </div>
-     </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="edit-group-popup" *ngIf="isGroupNameEditPopupOpen">
+    <h3>Edit Group Name</h3>
+    <form [formGroup]="editGroupNameForm" (ngSubmit)="editGroupName()">
+      <div class="form-input">
+        <input
+          type="text"
+          placeholder="Group Name"
+          formControlName="groupName"
+          [(ngModel)]="groupName"
+          [value]="receiverName"
+        />
+      </div>
+      <div class="form-buttons">
+        <button type="submit">Update</button>
+        <button (click)="closeGroupNameEditPopup()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="showMember-group-popup" *ngIf="isShowMemberPopupOpen">
+    <h3>Group Members</h3>
+    <button class="close-button" (click)="closeShowMemberPopup()">
+      <i class="bi bi-x close-icon"></i>
+    </button>
+    <ul class="group-members-list">
+      <li
+        *ngFor="let member of groupMemberUsernames"
+        class="group-member-item"
+        (click)="openRemoveOrAdminPopup(member)"
+      >
+        {{ member.userName }}
+      </li>
+    </ul>
+  </div>
+
+  <div class="addMember-group-popup" *ngIf="isAddGroupMemberPopupOpen">
+    <h4 class="class-notMember">User not in group</h4>
+    <button class="close-button" (click)="closeAddGroupMemberPopup()">
+      <i class="bi bi-x close-icon"></i>
+    </button>
+    <ul class="group-members-list">
+      <li
+        *ngFor="let user of userNotInGroup"
+        class="group-member-item"
+        (click)="addedGroupMember(user.userId)"
+        [class.selected-user]="isMemberAdded(user.userId)"
+      >
+        {{ user.userName }}
+      </li>
+      <li class="group-member-item add-button" (click)="AddMembersInGroup()">
+        Add Selected Members
+      </li>
+    </ul>
+  </div>
+
+  <div class="remove-or-admin-popup" *ngIf="isRemoveOrAdminPopupOpen">
+    <div class="header-close">
+      <button class="close-button1" (click)="closeRemoveOrAdminPopup()">
+        <i class="bi bi-x close-icon"></i>
+      </button>
+    </div>
+    <div class="action-buttons">
+      <button
+        class="action-button removeMember btn mb-2 mb-md-0 btn-secondary btn-block btn-round"
+        (click)="removeGroupMember(selectedMember)"
+      >
+        Remove Member <i class="bi bi-trash"></i>
+      </button>
+      <button
+        class="action-button adminButton btn mb-2 mb-md-0 btn-secondary btn-block btn-round"
+        (click)="makeUserAdmin()"
+      >
+        Make Admin <i class="bi bi-person-fill-check"></i>
+      </button>
+    </div>
   </div>
 </div>
-
-<div class="edit-group-popup" *ngIf="isGroupNameEditPopupOpen">
-   <h3>Edit Group Name</h3>
-   <form [formGroup]="editGroupNameForm" (ngSubmit)="editGroupName()">
-     <div class="form-input">
-       <input type="text" placeholder="Group Name" formControlName="groupName" [(ngModel)]="groupName" [value]="receiverName">
-     </div>
-     <div class="form-buttons">
-       <button type="submit">Update</button>
-       <button (click)="closeGroupNameEditPopup()">Cancel</button>
-     </div>
-   </form>
-</div>
-
-<div class="showMember-group-popup" *ngIf="isShowMemberPopupOpen">
-   <h3>Group Members</h3>
-   <button class="close-button" (click)="closeShowMemberPopup()"><i class="bi bi-x close-icon"></i></button>
-   <ul class="group-members-list">
-      <li *ngFor="let member of groupMemberUsernames" class="group-member-item" (click)="openRemoveOrAdminPopup(member)">
-         {{ member.userName }}
-      </li>
-   </ul>
-</div>
-
-<div class="addMember-group-popup" *ngIf="isAddGroupMemberPopupOpen">
-   <h4 class="class-notMember">User not in group</h4>
-   <button class="close-button" (click)="closeAddGroupMemberPopup()"><i class="bi bi-x close-icon"></i></button>
-   <ul class="group-members-list">
-      <li *ngFor="let user of userNotInGroup" class="group-member-item" (click)="addedGroupMember(user.userId)"
-      [class.selected-user]="isMemberAdded(user.userId)"
-      >
-         {{ user.userName }}
-      </li>
-      <li class="group-member-item add-button" (click)="AddMembersInGroup()">Add Selected Members</li>
-   </ul>
-</div>
-
-<div class="remove-or-admin-popup" *ngIf="isRemoveOrAdminPopupOpen">
-   <div class="header-close">
-       <button class="close-button1 " (click)="closeRemoveOrAdminPopup()"><i class="bi bi-x close-icon"></i></button>
-   </div>
-   <div class="action-buttons">
-       <button class="action-button removeMember btn mb-2 mb-md-0 btn-secondary btn-block btn-round" (click)="removeGroupMember(selectedMember)">Remove Member <i class="bi bi-trash"></i></button>
-       <button class="action-button adminButton  btn mb-2 mb-md-0 btn-secondary btn-block btn-round" (click)="makeUserAdmin()">Make Admin <i class="bi bi-person-fill-check"></i></button>
-   </div>
-</div>
-
-
-
