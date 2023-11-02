@@ -59,6 +59,10 @@ export class ChatWithUserComponent implements OnInit {
   wantToAddMembers: string[] = [];
   hoveredMessageId: number | null = null;
 
+  messageReactions! : any[];
+
+  isEmojiPopupOpen : boolean = false;
+
   @ViewChild('forScrolling') forScrolling!: ElementRef;
 
   constructor(
@@ -540,7 +544,7 @@ export class ChatWithUserComponent implements OnInit {
     const messageId = this.hoveredMessageId;
 
     if (this.hoveredMessageId != null) {
-      this.chatService.addEmojiReaction(this.hoveredMessageId, emoji).subscribe(
+      this.chatService.addEmojiReaction(this.hoveredMessageId,this.loggedinUserId, emoji).subscribe(
         (response) => {
           // Handle success response (e.g., show a success message)
           this.toastr.success("Emoji reaction added successfully",'Success');
@@ -557,9 +561,23 @@ export class ChatWithUserComponent implements OnInit {
     }
   }
 
+  getEmojiReactionsForMessage(messageId: number) {
+    this.chatService.getEmojiReactionsForMessage(messageId).subscribe(
+      (reactions: any[]) => {
+        // reactions is an array of emoji reactions
+        this.messageReactions = reactions;
+        console.log("Message Reaction : ",this.messageReactions);
+        
+      },
+      (error) => {
+        console.error('Error fetching emoji reactions:', error);
+      }
+    );
+  }
+
   removeEmojiReaction(messageId: number) {
     // Remove the emoji reaction by sending an empty string or null to the backend
-    this.chatService.addEmojiReaction(messageId, "NULL").subscribe(
+    this.chatService.addEmojiReaction(messageId, this.loggedinUserId,"NULL").subscribe(
       (response) => {
         // Handle success response (e.g., show a success message)
         this.toastr.success("Emoji reaction removed successfully", 'Success');
@@ -575,7 +593,17 @@ export class ChatWithUserComponent implements OnInit {
       }
     );
   }
+
+  openEmojiPopup(emojiReaction : any)
+  {
+    this.isEmojiPopupOpen = true;
+    this.messageReactions = emojiReaction;
+  }
   
+  closeEmojiPopup()
+  {
+    this.isEmojiPopupOpen = false;
+  }
 
 }
 
