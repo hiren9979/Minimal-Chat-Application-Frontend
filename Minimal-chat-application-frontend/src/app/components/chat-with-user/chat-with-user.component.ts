@@ -30,6 +30,7 @@ export class ChatWithUserComponent implements OnInit {
   @Input() conversationHistory: any[] = [];
   @Input() receiverName: string = '';
   @Input() receiverId: string = '';
+  @Input() isGroup : boolean = false;
   loggedinUserId: string = '';
   isOpenPopUp: boolean = false;
   searchText: string = '';
@@ -63,6 +64,35 @@ export class ChatWithUserComponent implements OnInit {
 
   isEmojiPopupOpen : boolean = false;
 
+
+  //////////////////
+
+  userList: any[] = [];
+  selectedUser: any = null; // To store the selected user
+  messageText: string = ''; // To store the message text
+  wholeConversation: any[] = []; //To store the whole conversation
+ 
+  time = new Date();
+  senderId: string = '';
+  sort = 'asc';
+  count = 20;
+
+  searchQuery: string = '';
+  // Define a property to store the search results
+  searchResults: any[] = [];
+  showUserList: boolean = true; // Variable to control whether to show user list or search results
+
+  showCreateGroupPopup = false;
+  selectedUserIds: string[] = [];  groupList: any[] = []; // Property to store the list of created groups
+
+  selectedGroup: any = null;
+
+  tagUser: boolean = false;
+  msg: string = '';
+  tagUserList: any[] = [];
+  isUserTagged: boolean = false;
+
+
   @ViewChild('forScrolling') forScrolling!: ElementRef;
 
   constructor(
@@ -95,17 +125,13 @@ export class ChatWithUserComponent implements OnInit {
 
     console.log('chat with user : ', this.conversationHistory);
 
-    this.conversationHistory = this.conversationHistory.filter(
-      (message, index, self) =>
-        self.findIndex((m) => m.id === message.id) === index
-    );
-
-    console.log('After conversationHistory : ', this.conversationHistory);
 
     this.conversationHistory = this.conversationHistory.filter(
       (message, index, self) =>
         self.findIndex((m) => m.id === message.id) === index
     );
+
+    
 
     const uniqueMessageIds = new Set<number>();
 
@@ -167,15 +193,15 @@ export class ChatWithUserComponent implements OnInit {
   ngAfterViewChecked(): void {
     // Detect changes and scroll to the bottom when new messages are added
     this.cdRef.detectChanges();
-    this.scrollToBottom();
+    // this.scrollToBottom();
   }
 
-  scrollToBottom() {
-    if (this.forScrolling) {
-      const chatContainerElement = this.forScrolling.nativeElement;
-      chatContainerElement.scrollTop = chatContainerElement.scrollHeight;
-    }
-  }
+  // scrollToBottom() {
+  //   if (this.forScrolling) {
+  //     const chatContainerElement = this.forScrolling.nativeElement;
+  //     chatContainerElement.scrollTop = chatContainerElement.scrollHeight;
+  //   }
+  // }
 
   editMessage(messageId: number) {
     debugger;
@@ -541,14 +567,37 @@ export class ChatWithUserComponent implements OnInit {
   }
 
   reactToMessage(emoji: string) {
-    const messageId = this.hoveredMessageId;
 
     if (this.hoveredMessageId != null) {
       this.chatService.addEmojiReaction(this.hoveredMessageId,this.loggedinUserId, emoji).subscribe(
         (response) => {
           // Handle success response (e.g., show a success message)
+
+          const message = this.conversationHistory.find(message => message.id === this.hoveredMessageId);
+          // if (messageIndex !== -1) {
+          //   this.conversationHistory[messageIndex].emoji = response.emoji;
+          // }
+
+          const messageIndex = this.conversationHistory.findIndex(message => message.id === this.hoveredMessageId);
+          this.conversationHistory[messageIndex] = message;
+
+          for (const reaction of message.emojiReaction) {
+            if (reaction.userId === response.userId) {
+              reaction.emoji = response.emoji;
+              break; // Assuming each user can have only one reaction, you can break the loop once you find a matching user.
+            }
+          }
+
           this.toastr.success("Emoji reaction added successfully",'Success');
-          this.sharedChatService.getConversationHistory();
+          console.log("message : " , messageIndex ,message);
+          console.log("response : ",response);
+
+          console.log("ch : " , this.conversationHistory);
+             
+          // this.getConversation();
+           this.sharedChatService.addMessageToHistory(response);
+          console.log("conversation histroy after change in emoji ***************" , this.conversationHistory);
+
           this.cdRef.detectChanges();
           
         },
@@ -561,30 +610,23 @@ export class ChatWithUserComponent implements OnInit {
     }
   }
 
-  getEmojiReactionsForMessage(messageId: number) {
-    this.chatService.getEmojiReactionsForMessage(messageId).subscribe(
-      (reactions: any[]) => {
-        // reactions is an array of emoji reactions
-        this.messageReactions = reactions;
-        console.log("Message Reaction : ",this.messageReactions);
-        
-      },
-      (error) => {
-        console.error('Error fetching emoji reactions:', error);
-      }
-    );
-  }
-
   removeEmojiReaction(messageId: number) {
     // Remove the emoji reaction by sending an empty string or null to the backend
-    this.chatService.addEmojiReaction(messageId, this.loggedinUserId,"NULL").subscribe(
+    this.chatService.addEmojiReaction(messageId, this.loggedinUserId, "NULL").subscribe(
       (response) => {
         // Handle success response (e.g., show a success message)
         this.toastr.success("Emoji reaction removed successfully", 'Success');
         console.log('Emoji reaction removed successfully');
+  
+        // Trigger the conversation retrieval after removing the emoji reaction
+        this.getConversation();
+        // Find the specific message in conversationHistory and update the latest response
+      const messageIndex = this.conversationHistory.findIndex(message => message.id === messageId);
+      if (messageIndex !== -1) {
+        this.conversationHistory[messageIndex].emoji = response.emoji;
+      }
+        console.log("conversation histroy after change in emoji ***************" , this.conversationHistory);
         
-        // Trigger change detection to refresh the component
-        this.cdRef.detectChanges();
       },
       (error) => {
         // Handle error response (e.g., show an error message)
@@ -593,6 +635,43 @@ export class ChatWithUserComponent implements OnInit {
       }
     );
   }
+  
+  private getConversation() {
+    // Use your chat service to fetch conversation history
+    this.chatService
+      .getConversationHistory(
+        this.senderId,
+        this.receiverId,
+        this.sort,
+        this.time,
+        this.count,
+        this.isGroup
+      )
+      .subscribe(
+        (response) => {
+          this.conversationHistory = response.messages.reverse();
+  
+          // Prepend conversationHistory to wholeConversation
+          this.wholeConversation.unshift(...this.conversationHistory);
+          // this.time =
+          //   this.conversationHistory.length > 0
+          //     ? new Date(this.conversationHistory[0].timestamp)
+          //     : new Date();
+  
+          this.toastr.success('Conversation history retrieved!', 'Success');
+          console.log('Conversation history in getConversation', this.conversationHistory);
+  
+          // Now that conversation history has been updated, you can log the statement here
+          console.log("conversation histroy after change in emoji ***************", this.conversationHistory);
+        },
+        (error) => {
+          console.log('Error fetching conversation history:', error);
+          this.toastr.error("Error while fetching conversationHistroy", error);
+        }
+      );
+  }
+  
+
 
   openEmojiPopup(emojiReaction : any)
   {
@@ -604,6 +683,9 @@ export class ChatWithUserComponent implements OnInit {
   {
     this.isEmojiPopupOpen = false;
   }
+
+
+
 
 }
 
