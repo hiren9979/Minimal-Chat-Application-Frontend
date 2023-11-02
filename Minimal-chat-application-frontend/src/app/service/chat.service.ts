@@ -182,7 +182,7 @@ receiveMessageSignalR(): Observable<any> {
     return this.http.get(`${this.apiUrl}/SearchConversations?query=${query}&receiverId=${receiverId}`, { headers });
   }
 
-  addEmojiReaction(messageId: number,userId : string, emoji: string): Observable<any> {
+addEmojiReaction(messageId: number,userId : string, emoji: string): Observable<any> {
     const url = 'https://localhost:7288/api/EmojiReaction/AddEmoji'
     const body = {
       MessageId: messageId,
@@ -193,8 +193,4 @@ receiveMessageSignalR(): Observable<any> {
     return this.http.post(url, body);
   }
 
-  getEmojiReactionsForMessage(messageId: number): Observable<any[]> {
-    const url = `${this.apiUrl}/GetEmojiReaction/${messageId}`;
-    return this.http.get<any[]>(url);
-  }
 }

@@ -153,7 +153,7 @@
       <div
         class="chat-messages"
         #ConversationHistory
-        [scrollTop]="0"
+        
         style="overflow-y: scroll"
         (scroll)="onScroll($event)"
       >
@@ -162,6 +162,7 @@
           [isUserSelected]="isUserSelected"
           [receiverName]="receiverName"
           [receiverId]="receiverId"
+          [isGroup]="isGroup"
         ></chat-with-user>
       </div>
 

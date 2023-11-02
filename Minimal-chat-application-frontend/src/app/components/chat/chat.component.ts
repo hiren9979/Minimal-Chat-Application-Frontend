@@ -31,6 +31,7 @@ export const WINDOW = new InjectionToken('WindowToken');
 })
 export class ChatComponent implements OnInit {
   @ViewChild('chatContainer', { static: false }) chatContainer!: ElementRef;
+  @ViewChild('forScrolling') forScrolling!: ElementRef;
 
   sendMessageForm!: FormGroup;
   createGroupForm!: FormGroup;
@@ -334,13 +335,16 @@ export class ChatComponent implements OnInit {
             this.conversationHistory.length > 0
               ? new Date(this.conversationHistory[0].timestamp)
               : new Date();
-
+              setTimeout(() => {
+                this.scrollToBottom();
+              });
           // this.chatService.sendMessageSignalR(newMessage);
           this.toastr.success('Conversation history retrieved!', 'Success');
           console.log(
             'Conversation history in getConversation',
             this.conversationHistory
           );
+
         },
         (error) => {
           console.log('Error fetching conversation history:', error);
@@ -530,4 +534,13 @@ export class ChatComponent implements OnInit {
       }
     }
   }
+  scrollToBottom() {
+    const messageContainer = document.querySelector('.chat-messages');
+    if (messageContainer) {
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+  }
+  
+
+
 }
