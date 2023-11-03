@@ -143,6 +143,28 @@ deleteMessagesignal(messageId: number): void {
   }
 
 
+  updateEmojiSignalR(message:any)
+  {
+    this.hubConnection.invoke('UpdateEmoji',message)
+    .catch(err => console.error(err));
+
+    this.sharedChatService.updateEmoji(message);
+
+  }
+
+  receiverEmojiSignalR(): Observable<any> {
+    return new Observable<any>(observer => {
+      this.hubConnection.on('ReceiveEmoji', (data: any) => {
+        observer.next(data);
+  
+        console.log("Hi received message : ",data);
+  
+      });
+      
+    });
+  }
+
+
 receiveMessageSignalR(): Observable<any> {
   return new Observable<any>(observer => {
     this.hubConnection.on('ReceiveMessage', (data: any) => {
