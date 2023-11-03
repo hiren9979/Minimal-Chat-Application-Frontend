@@ -63,7 +63,7 @@
       </div>
 
       <div class="emoji-reaction-display" (click)="openEmojiPopup(message.emojiReaction)" >
-         <div *ngIf="message.emojiReaction && message.emojiReaction.length >= 1">
+         <div *ngIf="message.emojiReaction && message.emojiReaction.length >= 1 && message.emojiReaction[0].emoji !== 'NULL' ">
             {{message.emojiReaction[0].emoji}}
             </div>
      </div>
@@ -108,14 +108,16 @@
 
   <div class="emoji-popup" *ngIf="isEmojiPopupOpen" (click)="closeEmojiPopup()">
    <div *ngFor="let reaction of messageReactions" class="emoji-reaction">
-      <div *ngIf="reaction.userId === loggedinUserId">
-          {{ reaction.emoji }} By You
-       </div>
-       <div *ngIf="reaction.userId !== loggedinUserId">
-         {{ reaction.emoji }} By {{ reaction.userName }}
-       </div>
+     <div *ngIf="reaction.userId === loggedinUserId && reaction.emoji !== 'NULL' ">
+       {{ reaction.emoji }} By You
+       <button (click)="removeEmojiReaction(reaction.messageId)">Remove</button>
+     </div>
+     <div *ngIf="reaction.userId !== loggedinUserId && reaction.emoji !== 'NULL' ">
+       {{ reaction.emoji }} By {{ reaction.userName }}
+     </div>
    </div>
  </div>
+ 
 
   <div class="edit-group-popup" *ngIf="isGroupNameEditPopupOpen">
     <h3>Edit Group Name</h3>
