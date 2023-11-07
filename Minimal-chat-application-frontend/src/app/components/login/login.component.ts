@@ -82,36 +82,41 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       const user = this.loginForm.value;
+  
+      // Check if a user with the same email is already logged in
+      const storedUser = localStorage.getItem('user');
+  
+      if (storedUser) {
+        const storedUserData = JSON.parse(storedUser);
+  
+        if (storedUserData && storedUserData.profile.email === user.email) {
+          // User with the same email is already logged in
+          this.toastr.warning('User with this email is already logged in.', 'Warning');
+          return;
+        }
+      }
+  
       this.authService.login(user).subscribe(
         (response) => {
           if (response.succeeded) {
             // Authentication was successful
             console.log('Login successful:', response);
-
+  
             // Store user data in local storage (you may want to secure this in a real application)
             localStorage.setItem('user', JSON.stringify(response));
-
+  
             // Display a success message and navigate to the chat page
             this.toastr.success('Login successful!', 'Success');
             this.router.navigate(['/chat']);
           } else {
             // Handle specific error scenarios
             if (response.error === 'User not found') {
-              this.toastr.error(
-                'User not found. Please check your email.',
-                'Error'
-              );
+              this.toastr.error('User not found. Please check your email.', 'Error');
             } else if (response.error === 'Invalid credentials') {
-              this.toastr.error(
-                'Invalid credentials. Please try again.',
-                'Error'
-              );
+              this.toastr.error('Invalid credentials. Please try again.', 'Error');
             } else {
               // Handle other errors
-              this.toastr.error(
-                'An error occurred. Please try again later.',
-                'Error'
-              );
+              this.toastr.error('An error occurred. Please try again later.', 'Error');
             }
           }
         },
@@ -122,4 +127,5 @@ export class LoginComponent {
       );
     }
   }
+  
 }

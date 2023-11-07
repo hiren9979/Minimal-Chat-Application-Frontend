@@ -685,7 +685,6 @@ export class ChatWithUserComponent implements OnInit {
     // Use your chat service to fetch conversation history
     this.chatService
       .getConversationHistory(
-        this.loggedinUserId,
         this.receiverId,
         this.sort,
         this.time,
