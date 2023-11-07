@@ -34,4 +34,13 @@ export class NavbarComponent {
     return null;
   }
 
+  checkLogin()
+  {
+    const user = localStorage.getItem('user');
+    if (user) {
+      return false;
+    }
+    return true;
+  }
+
 }

@@ -186,6 +186,7 @@ export class ChatComponent implements OnInit {
   startChat(userOrGroup: any) {
     // Set the selected user when a user is clicked
     this.selectedUser = userOrGroup;
+    this.time = new Date();
     if ('firstName' in userOrGroup) {
       this.receiverName = userOrGroup.firstName;
       this.isUserSelected = true;
@@ -317,7 +318,6 @@ export class ChatComponent implements OnInit {
     // Use your chat service to fetch conversation history
     this.chatService
       .getConversationHistory(
-        this.senderId,
         this.receiverId,
         this.sort,
         this.time,

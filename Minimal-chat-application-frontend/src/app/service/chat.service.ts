@@ -60,35 +60,31 @@ export class ChatService {
   }
 
   getConversationHistory(
-    senderId: string,
     receiverId: string,
     sort: string,
     time: Date,
     count: number,
-    isGroup : boolean,
+    isGroup: boolean
   ): Observable<any> {
-    let headers;
-     // Get the JWT token from AuthService
-     const token = this.authService.getToken();
-
-     if (token) {
-     headers = new HttpHeaders({    
-      Authorization: `Bearer ${token}`,
-    });
-  }
-
-     // Convert the Date object to an ISO string while preserving the local timezone
-  const isoTime = this.toLocalISOString(time);
-
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+  
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+  
+    const isoTime = this.toLocalISOString(time);
+  
     const params = new HttpParams()
       .set('receiverId', receiverId)
       .set('sort', sort)
-      .set('time',  isoTime)
-      .set('count', count.toString())
-      .set('isGroup',isGroup);
-
-      return this.http.get(`${this.apiUrl}/ConversationHistory`, { headers,params });
+      .set('time', isoTime)
+      .set('count', count)
+      .set('isGroup', isGroup);
+  
+    return this.http.get(`${this.apiUrl}/ConversationHistory`,  {headers,params});
   }
+  
 
   private toLocalISOString(date: Date): string {
     const tzo = -date.getTimezoneOffset(),
@@ -128,7 +124,7 @@ deleteMessagesignal(messageId: number): void {
       const options = {body,headers}
 
       // Make a POST request to send the message
-      return this.http.post(`${this.apiUrl}/SendMessages`, body,{headers});
+      return this.http.post(`${this.apiUrl}/messages`, body,{headers});
   }
 
   
@@ -182,12 +178,12 @@ receiveMessageSignalR(): Observable<any> {
     };
 
     // Make a POST request to edit the message
-    return this.http.post(`${this.apiUrl}/EditMessage/${messageId}`, body, { headers });
+    return this.http.post(`${this.apiUrl}/messages/${messageId}`, body, { headers });
   }
 
   deleteMessage(messageId: number, headers: HttpHeaders): Observable<any> {
     // Make a DELETE request to delete the message
-    return this.http.delete(`${this.apiUrl}/DeleteMessage/${messageId}`, { headers });
+    return this.http.delete(`${this.apiUrl}/messages/${messageId}`, { headers });
   }
 
   searchHistory(query:any,receiverId:string) : Observable<any>{
